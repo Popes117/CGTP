@@ -301,6 +301,32 @@ void box(int length, int divisions){
 	glEnd();
 }
 
+void cone(float radius, float height, int slices) {
+
+	int i;
+	float step;
+
+	step = 360.0/slices;
+
+	glColor3f(1,0,0);
+	glBegin(GL_TRIANGLE_FAN);
+
+		glVertex3f(0,height*0.5,0);
+		for (i=0; i <= slices; i++) {
+			glVertex3f(cos(i * step * M_PI/180.0)*radius,-height*0.5,-sin(i * step *M_PI/180.0)*radius);
+		}
+	glEnd();
+
+	glColor3f(0,1,0);
+	glBegin(GL_TRIANGLE_FAN);
+
+		glVertex3f(0,-height*0.5,0);
+		for (i=0; i <= slices; i++) {
+			glVertex3f(cos(i * step * M_PI/180.0)*radius,-height*0.5,sin(i * step *M_PI/180.0)*radius);
+		}
+	glEnd();
+}
+
 void renderScene(void) {
 
 	// clear buffers
@@ -330,7 +356,8 @@ void renderScene(void) {
 
 	//cylinder0(1,2,10);
 	//plane(2,5);
-	box(2,5);
+	//box(2,5);
+	cone(1,2,20);
 
 	// End of frame
 	glutSwapBuffers();
