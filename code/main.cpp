@@ -113,28 +113,30 @@ void cone(float radius, float height, int slices,int stacks) {
 
 	// bottom
 	for (i = 0; i < slices; i++) {
-		glVertex3f(0, -height*0.5, 0);
-		glVertex3f(cos((i + 1) * step * M_PI / 180.0)*radius, -height*0.5, -sin((i + 1) * step *M_PI / 180.0)*radius);
-		glVertex3f(cos(i * step * M_PI / 180.0)*radius, -height*0.5, -sin(i * step *M_PI / 180.0)*radius);
+		glVertex3f(0, 0, 0);
+		glVertex3f(cos((i + 1) * step * M_PI / 180.0)*radius, 0, -sin((i + 1) * step *M_PI / 180.0)*radius);
+		glVertex3f(cos(i * step * M_PI / 180.0)*radius, 0, -sin(i * step *M_PI / 180.0)*radius);
 	}
 
 	// body
 	for (i = 0; i <= slices; i++) {
 		
 		//Triângulos da primeira stack
-		glVertex3f(0.0f,height*0.5,0.0f);
-		glVertex3f(cos(i * step * M_PI / 180.0)*radius/stacks, height*0.5 - n_stacks, -sin(i * step *M_PI / 180.0)*radius/stacks);
-		glVertex3f(cos((i + 1) * step * M_PI / 180.0)*radius/stacks, height*0.5 - n_stacks, -sin((i + 1) * step *M_PI / 180.0)*radius/stacks);
+		glVertex3f(0.0f,height,0.0f);
+		glVertex3f(cos(i * step * M_PI / 180.0)*radius/stacks, height - n_stacks, -sin(i * step *M_PI / 180.0)*radius/stacks);
+		glVertex3f(cos((i + 1) * step * M_PI / 180.0)*radius/stacks, height - n_stacks, -sin((i + 1) * step *M_PI / 180.0)*radius/stacks);
 		
 		for(int j = 1; j < stacks; j++){
+
 			//Triângulo da metade da esquerda
-			glVertex3f(cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height*0.5 - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j));
-			glVertex3f(cos(i * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height*0.5 - n_stacks*(j+1), -sin(i * step *M_PI / 180.0)*((radius/stacks)*(j+1)));
-			glVertex3f(cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height*0.5 - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1)));	
+			glVertex3f(cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j));
+			glVertex3f(cos(i * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin(i * step *M_PI / 180.0)*((radius/stacks)*(j+1)));
+			glVertex3f(cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1)));	
+			
 			//Triângulo da metade da direita
-			glVertex3f(cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), height*0.5 - n_stacks*j, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j));
-			glVertex3f(cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height*0.5 - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j));
-			glVertex3f(cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height*0.5 - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1)));	
+			glVertex3f(cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j));
+			glVertex3f(cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j));
+			glVertex3f(cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1)));	
 		}
 	}
 	glEnd();
@@ -334,7 +336,7 @@ void renderScene(void) {
 	//cylinder0(1,2,10);
 	//plane(2,7);
 	//box(2,5);
-	//cone(1,2,10,10);
+	cone(1,2,20,20);
 
 	// End of frame
 	glutSwapBuffers();
