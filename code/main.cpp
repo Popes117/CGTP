@@ -1,10 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <vector>
+#include <tuple>
 #endif
 
 #define _USE_MATH_DEFINES
@@ -12,7 +15,7 @@
 
 float alfa = 0.0f, beta = 0.0f, radius = 5.0f;
 float camX, camY, camZ;
-
+using namespace std;
 
 void spherical2Cartesian() {
 
@@ -105,7 +108,7 @@ void cone(float radius, float height, int slices,int stacks) {
 	int i;
 	float step;
 	float n_stacks;
-
+	
 	step = 360.0 / slices;
 	n_stacks = height/stacks;
 
@@ -140,6 +143,77 @@ void cone(float radius, float height, int slices,int stacks) {
 		}
 	}
 	glEnd();
+}
+
+void sphere(float radius, int slices, int stacks) {
+
+	int i;
+	float step;
+	float n_stacks;
+	tuple<float, float, float>** matrix = new tuple<float, float, float>* [slices];
+	for (int i = 0; i < slices; ++i)
+		matrix[i] = new tuple<float, float, float>[stacks];
+
+
+	step = 360.0 / slices; 
+	n_stacks = radius / stacks; 
+
+	glBegin(GL_TRIANGLES);
+
+	// body
+	for (i = 0; i <= slices; i++) {
+
+		/*for (int j = 1; j < stacks; j++) {
+
+			//Triângulo da metade da esquerda
+			glVertex3f(cos(i * step * M_PI / 180.0) * ((radius / stacks) * j), radius - n_stacks * j, -sin(i * step * M_PI / 180.0) * ((radius / stacks) * j));
+			glVertex3f(cos(i * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)), radius - n_stacks * (j + 1), -sin(i * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)));
+			glVertex3f(cos((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)), radius - n_stacks * (j + 1), -sin((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)));
+
+			//Triângulo da metade da direita
+			glVertex3f(cos((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * j), radius - n_stacks * j, -sin((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * j));
+			glVertex3f(cos(i * step * M_PI / 180.0) * ((radius / stacks) * j), radius - n_stacks * j, -sin(i * step * M_PI / 180.0) * ((radius / stacks) * j));
+			glVertex3f(cos((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)), radius - n_stacks * (j + 1), -sin((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)));
+		}*/
+	}
+	for (i = 0; i < stacks; i++) {
+		float lat = 180/stacks * i;
+		for (int j = 0; j < slices; j++) {
+			float lon = j * step;
+			float x = radius * sin(lat) * cos(lon);
+			float z = radius * sin(lat) * sin(lon);
+			float y = radius * cos(lat);
+			matrix[i][j] = make_tuple(x, y, z);
+		}
+
+	}
+	for (i = 0; i < stacks-1; i++) {
+		glBegin(GL_TRIANGLES);
+		for (int j = 1; j < slices-1; j++) {
+
+			//Triângulo da metade da esquerda
+			glVertex3f(get<0>(matrix[i][j]), get<1>(matrix[i][j]), get<2>(matrix[i][j]));
+			//glVertex3f(get<0>(matrix[i][j+1]), get<1>(matrix[i][j+1]), get<2>(matrix[i][j+1]));
+			//glVertex3f(get<0>(matrix[i+1][j]), get<1>(matrix[i+1][j]), get<2>(matrix[i+1][j+1]));
+
+			//glVertex3f(cos(i * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)), radius - n_stacks * (j + 1), -sin(i * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)));
+			//glVertex3f(cos((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)), radius - n_stacks * (j + 1), -sin((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)));
+
+			//Triângulo da metade da direita
+			glVertex3f(get<0>(matrix[i+1][j]), get<1>(matrix[i+1][j]), get<2>(matrix[i+1][j]));
+			glVertex3f(get<0>(matrix[i][j+1]), get<1>(matrix[i][j+1]), get<2>(matrix[i][j+1]));
+			//glVertex3f(get<0>(matrix[i][j]), get<1>(matrix[i][j]), get<2>(matrix[i][j]));
+			//glVertex3f(get<0>(matrix[i+1][j]), get<1>(matrix[i][j+1]), get<2>(matrix[i+1][j+1]));
+			
+			//glVertex3f(cos((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * j), radius - n_stacks * j, -sin((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * j));
+			//glVertex3f(cos(i * step * M_PI / 180.0) * ((radius / stacks) * j), radius - n_stacks * j, -sin(i * step * M_PI / 180.0) * ((radius / stacks) * j));
+			//glVertex3f(cos((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)), radius - n_stacks * (j + 1), -sin((i + 1) * step * M_PI / 180.0) * ((radius / stacks) * (j + 1)));
+		}
+		glEnd();
+	}
+	for (int i = 0; i < slices; ++i)
+		delete[] matrix[i];
+	delete[] matrix;
 }
 
 void plane(int length, int divisions){
@@ -336,7 +410,7 @@ void renderScene(void) {
 	//cylinder0(1,2,10);
 	//plane(2,7);
 	//box(2,5);
-	cone(1,2,20,20);
+	sphere(1,20,20);
 
 	// End of frame
 	glutSwapBuffers();

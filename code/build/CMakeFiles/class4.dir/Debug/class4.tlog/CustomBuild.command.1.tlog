@@ -1,0 +1,10 @@
+^C:\USERS\ZEEDU\ONEDRIVE\AMBIENTE DE TRABALHO\CG24\CODE\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/zeedu/OneDrive/Ambiente de Trabalho/cg24/code" "-BC:/Users/zeedu/OneDrive/Ambiente de Trabalho/cg24/code/build/CMakeFiles" --check-stamp-file "C:/Users/zeedu/OneDrive/Ambiente de Trabalho/cg24/code/build/CMakeFiles/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
