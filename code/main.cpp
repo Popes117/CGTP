@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include "tinyxml2-master/tinyxml2.h"
+
+
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -16,6 +20,114 @@
 float alfa = 0.0f, beta = 0.0f, radius = 5.0f;
 float camX, camY, camZ;
 using namespace std;
+
+void processWindowElement(tinyxml2::XMLElement* windowElement) {
+	int width, height;
+	windowElement->QueryIntAttribute("width", &width);
+	windowElement->QueryIntAttribute("height", &height);
+
+	// Teste a imprimir para a consola a ver se leu bem
+	std::cout << "Window: Width = " << width << ", Height = " << height << std::endl;
+}
+
+void processCameraElement(tinyxml2::XMLElement* cameraElement) {
+	float px, py, pz, lx, ly, lz, ux, uy, uz, fov, near, far;
+
+	for (tinyxml2::XMLElement* child = cameraElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+		const char* childName = child->Name();
+
+		if (strcmp(childName, "position") == 0) {
+			child->QueryFloatAttribute("x", &px);
+			child->QueryFloatAttribute("y", &py);
+			child->QueryFloatAttribute("z", &pz);
+		}
+		else if (strcmp(childName, "lookAt") == 0) {
+			child->QueryFloatAttribute("x", &lx);
+			child->QueryFloatAttribute("y", &ly);
+			child->QueryFloatAttribute("z", &lz);
+		}
+		else if (strcmp(childName, "up") == 0) {
+			child->QueryFloatAttribute("x", &ux);
+			child->QueryFloatAttribute("y", &uy);
+			child->QueryFloatAttribute("z", &uz);
+		}
+		else if (strcmp(childName, "projection") == 0) {
+			child->QueryFloatAttribute("fov", &fov);
+			child->QueryFloatAttribute("near", &near);
+			child->QueryFloatAttribute("far", &far);
+		}
+	}
+	// Teste a imprimir para a consola a ver se leu bem
+	std::cout << "Camera: Position(" << px << ", " << py << ", " << pz << "), ";
+	std::cout << "LookAt(" << lx << ", " << ly << ", " << lz << "), ";
+	std::cout << "Up(" << ux << ", " << uy << ", " << uz << "), ";
+	std::cout << "Projection(FOV=" << fov << ", Near=" << near << ", Far=" << far << ")" << std::endl;
+}
+
+void processModelElement(tinyxml2::XMLElement* modelElement) {
+	const char* file = modelElement->Attribute("file");
+	if (file) {
+		// nao sei o que fazer com isto
+		std::cout << "Model: File = " << file << std::endl;
+	}
+	else {
+		std::cerr << "Model element is missing the 'file' attribute." << std::endl;
+	}
+}
+
+void processModelsElement(tinyxml2::XMLElement* modelsElement) {
+	for (tinyxml2::XMLElement* modelElement = modelsElement->FirstChildElement("model"); modelElement; modelElement = modelElement->NextSiblingElement("model")) {
+		processModelElement(modelElement);
+	}
+}
+
+void processGroupElement(tinyxml2::XMLElement* groupElement) {
+	for (tinyxml2::XMLElement* child = groupElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+		const char* childName = child->Name();
+
+		if (strcmp(childName, "models") == 0) {
+			processModelsElement(child);
+		}
+		// Adicione mais condições conforme necessário para outros tipos de elementos dentro de 'group'
+	}
+}
+
+void processWorldElement(tinyxml2::XMLElement* worldElement) {
+	for (tinyxml2::XMLElement* child = worldElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+		const char* childName = child->Name();
+
+		if (strcmp(childName, "window") == 0) {
+			processWindowElement(child);
+		}
+		else if (strcmp(childName, "camera") == 0) {
+			processCameraElement(child);
+		}
+		else if (strcmp(childName, "group") == 0) {
+			processGroupElement(child);
+		}
+		// Falta light e transform para o futuro
+	}
+}
+
+int parsexml() {
+	tinyxml2::XMLDocument doc;
+	if (doc.LoadFile("config.xml") != tinyxml2::XML_SUCCESS) {
+		std::cerr << "Erro ao carregar o arquivo XML." << std::endl;
+		return 1;
+	}
+
+	tinyxml2::XMLElement* worldElement = doc.FirstChildElement("world");
+	if (!worldElement) {
+		std::cerr << "Elemento 'world' não encontrado." << std::endl;
+		return 1;
+	}
+
+	processWorldElement(worldElement);
+
+	return 0;
+}
+
+
 
 void spherical2Cartesian() {
 

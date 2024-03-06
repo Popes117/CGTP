@@ -1,0 +1,10 @@
+^C:\USERS\ALEXANDRE\DOCUMENTS\UNIVERSIDADE\CG\24\CG24\CODE\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Alexandre/Documents/Universidade/cg/24/cg24/code -BC:/Users/Alexandre/Documents/Universidade/cg/24/cg24/code/build --check-stamp-file C:/Users/Alexandre/Documents/Universidade/cg/24/cg24/code/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
