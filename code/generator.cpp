@@ -70,7 +70,7 @@ void generate_plane(int length, int divisions, const std::string& filename){
 		z += lado_length;
 	}
 
-	std::ofstream file("3DFiles/" + filename);
+	std::ofstream file("build/3DFiles/" + filename);
 
     // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
@@ -327,7 +327,7 @@ void generate_box(int length, int divisions, const std::string& filename){
 	box_parts.push_back(side3);
 	box_parts.push_back(side4);
 
-	std::ofstream file("3DFiles/" + filename);
+	std::ofstream file("build/3DFiles/" + filename);
 
     // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
@@ -429,7 +429,7 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 	cone_parts.push_back(stack);
 	cone_parts.push_back(body);
 
-	std::ofstream file("3DFiles/" + filename);
+	std::ofstream file("build/3DFiles/" + filename);
 
     // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
@@ -461,10 +461,11 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 
 }
 
-void main(int argc, char** argv){
+int main(int argc, char** argv){
 
 	generate_plane(1,3,"plane.3d");
 	generate_box(2,3,"box.3d");
 	generate_cone(1,2,20,20,"cone.3d");
 
+	return 1;
 }

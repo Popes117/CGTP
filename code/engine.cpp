@@ -26,7 +26,7 @@ struct Triangle{
 	std::vector<Coordenadas> pontos;
 };
 
-vector<Triangle> parsePlane(const std::string& filename) {
+std::vector<Triangle> parsePlane(const std::string& filename) {
     std::vector<Triangle> triangles;
 	std::ifstream file(filename);
 	char separador;
@@ -47,8 +47,9 @@ vector<Triangle> parsePlane(const std::string& filename) {
 	return triangles;
 }
 
-void main(int argc, char** argv){
+int main(int argc, char** argv){
 
 	std::vector<Triangle> plane_triangles = parsePlane("3DFiles/plane.3d");
 
+    return 1;
 }
