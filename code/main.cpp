@@ -265,15 +265,12 @@ void sphere(double radius, int slices, int stacks) {
 
 	int i;
 	float step;
-	float n_stacks;
-	//tuple<float, float, float>** matrix = new tuple<float, float, float>* [stacks];
-	//for (int i = 0; i < stacks; ++i)
-		//matrix[i] = new tuple<float, float, float>[slices];
-		
+	float n_stacks;		
 	
 	step = 360.0 / slices; 
 	n_stacks = 180 / stacks;
-	vector<tuple<float, float, float>> pontos;
+	vector<Coordenadas> pontos;
+    vector<Triangle> triangles;
  
 	// body
 	for (i = 0; i < stacks; i++) {
@@ -286,23 +283,29 @@ void sphere(double radius, int slices, int stacks) {
 			const double nextStack = currentStack + lat;
 			const double nextSlice = currentSlice + lon;
 
-			tuple<double, double, double> p0 = { (radius * sin(nextStack) * sin(nextSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(nextSlice))};
-			tuple<double, double, double> p1 = { (radius * sin(nextStack) * sin(currentSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(currentSlice)) };
-			tuple<double, double, double> p2 = { (radius * sin(currentStack) * sin(nextSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(nextSlice)) };
-			tuple<double, double, double> p3 = { (radius * sin(currentStack) * sin(currentSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(currentSlice)) };
+			Coordenadas p0 = { (radius * sin(nextStack) * sin(nextSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(nextSlice))};
+			Coordenadas p1 = { (radius * sin(nextStack) * sin(currentSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(currentSlice)) };
+			Coordenadas p2 = { (radius * sin(currentStack) * sin(nextSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(nextSlice)) };
+			Coordenadas p3 = { (radius * sin(currentStack) * sin(currentSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(currentSlice)) };
 
-			pontos.push_back(p0);
-			pontos.push_back(p1);
-			pontos.push_back(p3);
-			pontos.push_back(p2);
-			pontos.push_back(p3);
-			pontos.push_back(p0);
+            Triangle triangle1;
+            Triangle triangle2;
+
+			triangle1.pontos.push_back(p0);
+			triangle1.pontos.push_back(p1);
+			triangle1.pontos.push_back(p3);
+			triangle2.pontos.push_back(p2);
+			triangle2.pontos.push_back(p3);
+			triangle2.pontos.push_back(p0);
+
+            triangles.push_back(triangle1);
+            triangles.push_back(triangle2);
 			//matrix[i][j] = make_tuple(x, y, z);
 		}
 
 	}
 
-
+    /*
 	for (i = 0; i < stacks-1; i++) {
 		glBegin(GL_TRIANGLES);
 		for (int j = 1; j < slices-1; j++) {
@@ -318,10 +321,13 @@ void sphere(double radius, int slices, int stacks) {
 			}
 		glEnd();
 	}
+    */
 
 	glBegin(GL_TRIANGLES);
-	for (auto& element : pontos) {
-		glVertex3f(get<0>(element), get<1>(element), get<2>(element));
+	for (Triangle element : triangles) {
+		glVertex3f(element.pontos[0].p1,element.pontos[0].p2,element.pontos[0].p3);
+		glVertex3f(element.pontos[1].p1,element.pontos[1].p2,element.pontos[1].p3);
+		glVertex3f(element.pontos[2].p1,element.pontos[2].p2,element.pontos[2].p3);
 	}
 	glEnd();
 	//for (int i = 0; i < slices; ++i)
