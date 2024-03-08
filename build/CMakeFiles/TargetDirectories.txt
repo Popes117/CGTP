@@ -1,0 +1,3 @@
+/home/popes/Desktop/3ºAno 2ºSemestre/cg24/build/CMakeFiles/class4.dir
+/home/popes/Desktop/3ºAno 2ºSemestre/cg24/build/CMakeFiles/edit_cache.dir
+/home/popes/Desktop/3ºAno 2ºSemestre/cg24/build/CMakeFiles/rebuild_cache.dir

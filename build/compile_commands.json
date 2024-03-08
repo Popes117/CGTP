@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/build",
+  "command": "/usr/bin/g++   -g -o CMakeFiles/class4.dir/main.cpp.o -c \"/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/main.cpp\"",
+  "file": "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/main.cpp",
+  "output": "CMakeFiles/class4.dir/main.cpp.o"
+}
+]
