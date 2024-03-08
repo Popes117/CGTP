@@ -76,7 +76,7 @@ void generate_plane(int length, int divisions, const std::string& filename){
     // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
         // Escreve no arquivo
-        file << length << " " << divisions << "\n\n";
+        file << "plane" << "\n\n";
 
 			for(Triangle triangle : plane_triangles){
 				//for(Coordenadas ponto : triangle.pontos){
@@ -333,7 +333,7 @@ void generate_box(int length, int divisions, const std::string& filename){
     // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
         // Escreve no arquivo
-        file << length << " " << divisions << "\n\n";
+        file << "box" << "\n\n";
 
 		for(vector<Triangle> triangles : box_parts){
 			for(Triangle triangle : triangles){
@@ -435,7 +435,7 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
     // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
         // Escreve no arquivo
-        file << radius << " " << height << " " << slices << " " << stacks << "\n\n";
+        file << "cone" << "\n\n";
 
 		for(vector<Triangle> triangles : cone_parts){
 			for(Triangle triangle : triangles){

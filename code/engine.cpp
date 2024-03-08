@@ -22,6 +22,31 @@
 float alfa = 0.0f, betA = 0.0f, radius = 5.0f;
 float camX, camY, camZ;
 
+std::string filePath;
+std::vector<std::string> filePaths;
+
+int widtH;
+int heighT;
+
+float cameraX;
+float cameraY;
+float cameraZ;
+
+// Variáveis globais para a posição do lookAt
+float lookAtX;
+float lookAtY;
+float lookAtZ;
+
+// Variáveis globais para a direção para cima
+float upX;
+float upY;
+float upZ;
+
+// Variáveis globais para a perspetiva
+float foV;
+float neaR;
+float faR;
+
 int length_form;
 int divisions_form;
 
@@ -64,16 +89,15 @@ void changeSize(int w, int h) {
     glViewport(0, 0, w, h);
 
 	// Set perspective
-	gluPerspective(45.0f ,ratio, 1.0f ,1000.0f);
+	gluPerspective(foV ,1.0f, neaR, faR);
 
 	// return to the model view matrix mode
 	glMatrixMode(GL_MODELVIEW);
 }
 
 std::vector<Triangle> parsePlane(const std::string& filename) {
-    int length;
-    int divisions;
 
+	std::string first_line;
     std::vector<Triangle> triangles;
 	std::ifstream file(filename);
 	char separador;
@@ -82,7 +106,7 @@ std::vector<Triangle> parsePlane(const std::string& filename) {
     
     if (std::getline(file, linha)) {
         std::istringstream iss(linha);
-        iss >> length >> divisions;
+        iss >> first_line;
     }
     
     while (std::getline(file, linha)) {
@@ -102,13 +126,12 @@ std::vector<Triangle> parsePlane(const std::string& filename) {
         triangles.push_back(triangle);
     }
 
-    length_form = length;
-    divisions_form = divisions;
-
 	return triangles;
 }
 
 std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
+    
+    std::string first_line;
     int length;
     int divisions;
     int count = -1;
@@ -127,7 +150,7 @@ std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
     std::string linha;
     if (std::getline(file, linha)) {
         std::istringstream iss(linha);
-        iss >> length >> divisions;
+        iss >> first_line;
     }
 
     while (std::getline(file, linha)) {
@@ -159,6 +182,8 @@ std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
 }
 
 std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
+    
+    std::string first_line;
     float radius; 
     float height; 
     int slices;
@@ -176,7 +201,7 @@ std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
     std::string linha;
     if (std::getline(file, linha)) {
         std::istringstream iss(linha);
-        iss >> radius >> height >> slices >> stacks;
+        iss >> first_line;
     }
 
     while (std::getline(file, linha)) {
@@ -198,12 +223,12 @@ std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
     return triangles;
 }
 
-void draw_plane(){
+void draw_plane(const std::string& filename){
 
-    std::vector<Triangle> plane_triangles = parsePlane("build/3DFiles/plane.3d");
+    std::vector<Triangle> plane_triangles = parsePlane(filename);
 	
 	glBegin(GL_TRIANGLES);
-
+    glColor3f(1.0f, 1.0f, 1.0f);
 	for(Triangle triangle : plane_triangles){
 
 		glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
@@ -214,11 +239,12 @@ void draw_plane(){
 
 }
 
-void draw_box(){
+void draw_box(const std::string& filename){
 
-	std::vector<std::vector<Triangle>> box_triangles = parseBox("build/3DFiles/box.3d");
+	std::vector<std::vector<Triangle>> box_triangles = parseBox(filename);
 	
 	glBegin(GL_TRIANGLES);
+    glColor3f(1.0f, 1.0f, 1.0f);
 	for(std::vector<Triangle> triangles : box_triangles){
 		for(Triangle triangle : triangles){
 
@@ -232,11 +258,12 @@ void draw_box(){
 
 }
 
-void draw_cone(){
+void draw_cone(const std::string& filename){
 
-	std::vector<std::vector<Triangle>> cone_triangles = parseCone("build/3DFiles/cone.3d");
+	std::vector<std::vector<Triangle>> cone_triangles = parseCone(filename);
 	
 	glBegin(GL_TRIANGLES);
+    glColor3f(1.0f, 1.0f, 1.0f);
 	for(std::vector<Triangle> triangles : cone_triangles){
 		for(Triangle triangle : triangles){
 
@@ -248,6 +275,29 @@ void draw_cone(){
 	}
 	glEnd();
 
+}
+
+void handle_form(const std::string& filename){
+	
+    std::ifstream file(filename);
+	std::string first_line;
+    
+    std::string linha;
+    
+    if (std::getline(file, linha)) {
+        std::istringstream iss(linha);
+        iss >> first_line;
+    }
+
+    if (first_line == "plane") {
+        draw_plane(filename);
+    }
+    else if (first_line == "box") {
+        draw_box(filename);
+    }
+    else if (first_line == "cone") {
+        draw_cone(filename);
+    }
 }
 
 void printMuitosTriangles(const std::vector<std::vector<Triangle>>& triangles) {
@@ -276,6 +326,9 @@ void processWindowElement(tinyxml2::XMLElement* windowElement) {
     int width, height;
     windowElement->QueryIntAttribute("width", &width);
     windowElement->QueryIntAttribute("height", &height);
+
+    widtH = width;
+    heighT = height;
 
     //Teste a imprimir para a consola a ver se leu bem
     std::cout << "Window: Width = " << width << ", Height = " << height << std::endl;
@@ -308,15 +361,34 @@ void processCameraElement(tinyxml2::XMLElement* cameraElement) {
             child->QueryFloatAttribute("far", &far);
         }
     }
+
+    cameraX = px;
+    cameraY = py;
+    cameraZ = pz;
+
+    lookAtX = lx;
+    lookAtY = ly;
+    lookAtZ = lz;
+
+    upX = ux;
+    upY = uy;
+    upZ = uz;
+
+    foV = fov;
+    neaR = near;
+    faR = far;
+
     //Teste a imprimir para a consola a ver se leu bem
-    std::cout << "Camera: Position(" << px << ", " << py << ", " << pz << "), ";
-    std::cout << "LookAt(" << lx << ", " << ly << ", " << lz << "), ";
-    std::cout << "Up(" << ux << ", " << uy << ", " << uz << "), ";
-    std::cout << "Projection(FOV=" << fov << ", Near=" << near << ", Far=" << far << ")" << std::endl;
+    //std::cout << "Camera: Position(" << px << ", " << py << ", " << pz << "), ";
+    //std::cout << "LookAt(" << lx << ", " << ly << ", " << lz << "), ";
+    //std::cout << "Up(" << ux << ", " << uy << ", " << uz << "), ";
+    //std::cout << "Projection(FOV=" << fov << ", Near=" << near << ", Far=" << far << ")" << std::endl;
 }
  
 void processModelElement(tinyxml2::XMLElement* modelElement) {
     const char* file = modelElement->Attribute("file");
+    filePath = "build/3DFiles/" + std::string(file);
+    filePaths.push_back(filePath);
     if (file) {
         //nao sei o que fazer com isto
         std::cout << "Model: File = " << file << std::endl;
@@ -360,9 +432,9 @@ void processWorldElement(tinyxml2::XMLElement* worldElement) {
     }
 }
  
-int parsexml() {
+int parsexml(const char *filename) {
     tinyxml2::XMLDocument doc;
-    if (doc.LoadFile("test_files/test_files_phase_1/test_1_1.xml") != tinyxml2::XML_SUCCESS) {
+    if (doc.LoadFile(filename) != tinyxml2::XML_SUCCESS) {
         std::cerr << "Erro ao carregar o arquivo XML." << std::endl;
         return 1;
     }
@@ -385,9 +457,9 @@ void renderScene(){
 
 	// set the camera
 	glLoadIdentity();
-	gluLookAt(camX, camY, camZ,
-		0.0, 0.0, 0.0,
-		0.0f, 1.0f, 0.0f);
+	gluLookAt(cameraX, cameraY, cameraZ,
+		lookAtX, lookAtY, lookAtZ,
+		upX, upY, upZ);
 
 	// Eixos
 	glBegin(GL_LINES);
@@ -405,10 +477,9 @@ void renderScene(){
 	glVertex3f(0.0f, 0.0f, 100.0f);
 	glEnd();
 	
-	//draw_plane();
-	//draw_box();
-	draw_cone();
-
+    for(std::string filePath : filePaths){
+        handle_form(filePath);
+    }
 	// End of frame
 	glutSwapBuffers();
 }
@@ -468,12 +539,12 @@ void printInfo() {
 
 int main(int argc, char** argv){
 
-    parsexml();
-/*
+    parsexml(argv[1]);
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(800,800);
+	glutInitWindowSize(widtH,heighT);
 	glutCreateWindow("CG@DI-UM");
 		
 // Required callback registry 
@@ -501,6 +572,6 @@ int main(int argc, char** argv){
 
 // enter GLUT's main cycle
 	glutMainLoop();
-*/
+
     return 1;
 }
