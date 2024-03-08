@@ -129,29 +129,29 @@ class4/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/build
 .PHONY : class4/fast
 
-engine.o: engine.cpp.o
-.PHONY : engine.o
+main.o: main.cpp.o
+.PHONY : main.o
 
 # target to build an object file
-engine.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/engine.cpp.o
-.PHONY : engine.cpp.o
+main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/main.cpp.o
+.PHONY : main.cpp.o
 
-engine.i: engine.cpp.i
-.PHONY : engine.i
+main.i: main.cpp.i
+.PHONY : main.i
 
 # target to preprocess a source file
-engine.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/engine.cpp.i
-.PHONY : engine.cpp.i
+main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/main.cpp.i
+.PHONY : main.cpp.i
 
-engine.s: engine.cpp.s
-.PHONY : engine.s
+main.s: main.cpp.s
+.PHONY : main.s
 
 # target to generate assembly for a file
-engine.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/engine.cpp.s
-.PHONY : engine.cpp.s
+main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -162,9 +162,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... class4"
-	@echo "... engine.o"
-	@echo "... engine.i"
-	@echo "... engine.s"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 

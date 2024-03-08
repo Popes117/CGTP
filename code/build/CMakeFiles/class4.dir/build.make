@@ -69,28 +69,28 @@ include CMakeFiles/class4.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/class4.dir/flags.make
 
-CMakeFiles/class4.dir/engine.cpp.o: CMakeFiles/class4.dir/flags.make
-CMakeFiles/class4.dir/engine.cpp.o: /home/popes/Desktop/3ºAno\ 2ºSemestre/cg24/code/engine.cpp
-CMakeFiles/class4.dir/engine.cpp.o: CMakeFiles/class4.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/class4.dir/engine.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/class4.dir/engine.cpp.o -MF CMakeFiles/class4.dir/engine.cpp.o.d -o CMakeFiles/class4.dir/engine.cpp.o -c "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/engine.cpp"
+CMakeFiles/class4.dir/main.cpp.o: CMakeFiles/class4.dir/flags.make
+CMakeFiles/class4.dir/main.cpp.o: /home/popes/Desktop/3ºAno\ 2ºSemestre/cg24/code/main.cpp
+CMakeFiles/class4.dir/main.cpp.o: CMakeFiles/class4.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/class4.dir/main.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/class4.dir/main.cpp.o -MF CMakeFiles/class4.dir/main.cpp.o.d -o CMakeFiles/class4.dir/main.cpp.o -c "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/main.cpp"
 
-CMakeFiles/class4.dir/engine.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/class4.dir/engine.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/engine.cpp" > CMakeFiles/class4.dir/engine.cpp.i
+CMakeFiles/class4.dir/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/class4.dir/main.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/main.cpp" > CMakeFiles/class4.dir/main.cpp.i
 
-CMakeFiles/class4.dir/engine.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/class4.dir/engine.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/engine.cpp" -o CMakeFiles/class4.dir/engine.cpp.s
+CMakeFiles/class4.dir/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/class4.dir/main.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/main.cpp" -o CMakeFiles/class4.dir/main.cpp.s
 
 # Object files for target class4
 class4_OBJECTS = \
-"CMakeFiles/class4.dir/engine.cpp.o"
+"CMakeFiles/class4.dir/main.cpp.o"
 
 # External object files for target class4
 class4_EXTERNAL_OBJECTS =
 
-class4: CMakeFiles/class4.dir/engine.cpp.o
+class4: CMakeFiles/class4.dir/main.cpp.o
 class4: CMakeFiles/class4.dir/build.make
 class4: /usr/lib/libGL.so
 class4: /usr/lib/libGLU.so
