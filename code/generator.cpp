@@ -58,11 +58,11 @@ void generate_plane(int length, int divisions, const std::string& filename){
 			Triangle right_triangle;
 
 			Coordenadas coordenadas4 = {x + lado_length, 0.0f, z + lado_length};
-			right_triangle.pontos.push_back(coordenadas1);
+			right_triangle.pontos.push_back(coordenadas4);
 			Coordenadas coordenadas5 = {x + lado_length, 0.0f, z};
-			right_triangle.pontos.push_back(coordenadas2);
+			right_triangle.pontos.push_back(coordenadas5);
 			Coordenadas coordenadas6 = {x, 0.0f, z};
-			right_triangle.pontos.push_back(coordenadas3);
+			right_triangle.pontos.push_back(coordenadas6);
 			plane_triangles.push_back(right_triangle);	
 
 			x += lado_length;
@@ -419,11 +419,11 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 			Triangle right_triangle;
 
 			Coordenadas coordenadas4 = {cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j)};
-			right_triangle.pontos.push_back(coordenadas1);
+			right_triangle.pontos.push_back(coordenadas4);
 			Coordenadas coordenadas5 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j)};
-			right_triangle.pontos.push_back(coordenadas2);
+			right_triangle.pontos.push_back(coordenadas5);
 			Coordenadas coordenadas6 = {cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
-			right_triangle.pontos.push_back(coordenadas3);
+			right_triangle.pontos.push_back(coordenadas6);
 			body.push_back(right_triangle);	
 		}
 	}
