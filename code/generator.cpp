@@ -330,9 +330,7 @@ void generate_box(int length, int divisions, const std::string& filename){
 
 	std::ofstream file("build/3DFiles/" + filename);
 
-    // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
-        // Escreve no arquivo
         file << "box" << "\n\n";
 
 		for(vector<Triangle> triangles : box_parts){
@@ -350,12 +348,10 @@ void generate_box(int length, int divisions, const std::string& filename){
 			file << "\n";
 		}
 
-        // Fecha o arquivo
         file.close();
-        std::cout << "Texto escrito com sucesso no arquivo.\n";
+        std::cout << "Texto escrito com sucesso no ficheiro!.\n";
     } else {
-        // Se houver algum erro ao abrir o arquivo
-        std::cerr << "Erro ao abrir o arquivo.\n";
+        std::cerr << "Erro ao abrir o ficheiro!.\n";
     }
 }
 
@@ -432,9 +428,7 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 
 	std::ofstream file("build/3DFiles/" + filename);
 
-    // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
-        // Escreve no arquivo
         file << "cone" << "\n\n";
 
 		for(vector<Triangle> triangles : cone_parts){
@@ -452,14 +446,73 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 			file << "\n";
 		}
 
-        // Fecha o arquivo
         file.close();
-        std::cout << "Texto escrito com sucesso no arquivo.\n";
+        std::cout << "Texto escrito com sucesso no ficheiro!\n";
     } else {
-        // Se houver algum erro ao abrir o arquivo
-        std::cerr << "Erro ao abrir o arquivo.\n";
+        std::cerr << "Erro ao abrir o ficheiro!\n";
     }
 
+}
+
+void generate_sphere(double radius, int slices, int stacks, const std::string& filename){
+    int i;
+    float step;
+    float n_stacks;
+
+    step = 2* M_PI / slices; 
+    n_stacks = M_PI / stacks;
+    vector<Triangle> sphere_triangles;
+ 
+    // body
+    for (i = 0; i < slices; i++) {
+    const double currentSlice = i * step;
+    for (int j = 0; j < stacks; j++) {
+        const double currentStack = j * n_stacks;
+        const double nextStack = currentStack + n_stacks;
+        const double nextSlice = currentSlice + step;
+
+            Coordenadas p0 = { (radius * sin(nextStack) * sin(nextSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(nextSlice))};
+            Coordenadas p1 = { (radius * sin(nextStack) * sin(currentSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(currentSlice)) };
+            Coordenadas p2 = { (radius * sin(currentStack) * sin(nextSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(nextSlice)) };
+            Coordenadas p3 = { (radius * sin(currentStack) * sin(currentSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(currentSlice)) };
+
+            Triangle left;
+            Triangle right;
+
+            left.pontos.push_back(p0);
+            left.pontos.push_back(p3);
+            left.pontos.push_back(p1);
+            right.pontos.push_back(p2);
+            right.pontos.push_back(p3);
+            right.pontos.push_back(p0);
+
+			sphere_triangles.push_back(left);
+			sphere_triangles.push_back(right);		
+        }
+    }
+
+	std::ofstream file("build/3DFiles/" + filename);
+
+    if (file.is_open()) {
+        file << "sphere" <<  "\n\n";
+
+			for(Triangle triangle : sphere_triangles){
+				for(int i = 0; i < triangle.pontos.size(); ++i){
+					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
+					    if (i < triangle.pontos.size() - 1) { 
+        				    file << " ; ";
+        				} else {
+        				    file << " "; 
+        				}
+				}
+				file << "\n";
+			}
+		
+        file.close();
+        std::cout << "Texto escrito com sucesso no ficheiro!.\n";
+    } else {
+        std::cerr << "Erro ao abrir o ficheiro!.\n";
+    }
 }
 
 int main(int argc, char** argv){
@@ -478,8 +531,11 @@ int main(int argc, char** argv){
 	else if (strcmp(argv[1], "cone") == 0) {
 		generate_cone(std::stof(argv[2]), std::stof(argv[3]),std::stoi(argv[4]), std::stoi(argv[5]),argv[6]);
 	}
+	else if (strcmp(argv[1], "sphere") == 0) {
+		generate_sphere(std::stof(argv[2]), std::stof(argv[3]), std::stoi(argv[4]),argv[5]);
+	}
 	else{
-        std::cout << "Erro ao abrir o arquivo!\n";
+        std::cout << "Erro ao abrir o ficheiro!\n";
 		return 0;
 	}
 

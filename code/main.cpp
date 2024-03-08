@@ -263,76 +263,42 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 
 void sphere(double radius, int slices, int stacks) {
 
-	int i;
-	float step;
-	float n_stacks;		
-	
-	step = 360.0 / slices; 
-	n_stacks = 180 / stacks;
-	vector<Coordenadas> pontos;
-    vector<Triangle> triangles;
+    int i;
+    float step;    float n_stacks;
+
+    step = 2* M_PI / slices; 
+    n_stacks = M_PI / stacks;
+    vector<tuple<float, float, float>> pontos;
  
-	// body
-	for (i = 0; i < stacks; i++) {
-		float lat = n_stacks*i;
-		for (int j = 0; j < slices; j++) {
-			double lon = j * step;
+    // body
+    for (i = 0; i < slices; i++) {
+        const double currentSlice = i * step;
+        for (int j = 0; j < stacks; j++) {
+            const double currentStack = j * n_stacks;
+            const double nextStack = currentStack + n_stacks;
+            const double nextSlice = currentSlice + step;
 
-			const double currentStack = i * lat;
-			const double currentSlice = j * lon;
-			const double nextStack = currentStack + lat;
-			const double nextSlice = currentSlice + lon;
+            tuple<double, double, double> p0 = { (radius * sin(nextStack) * sin(nextSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(nextSlice))};
+            tuple<double, double, double> p1 = { (radius * sin(nextStack) * sin(currentSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(currentSlice)) };
+            tuple<double, double, double> p2 = { (radius * sin(currentStack) * sin(nextSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(nextSlice)) };
+            tuple<double, double, double> p3 = { (radius * sin(currentStack) * sin(currentSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(currentSlice)) };
 
-			Coordenadas p0 = { (radius * sin(nextStack) * sin(nextSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(nextSlice))};
-			Coordenadas p1 = { (radius * sin(nextStack) * sin(currentSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(currentSlice)) };
-			Coordenadas p2 = { (radius * sin(currentStack) * sin(nextSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(nextSlice)) };
-			Coordenadas p3 = { (radius * sin(currentStack) * sin(currentSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(currentSlice)) };
+            pontos.push_back(p0);
+            pontos.push_back(p3);
+            pontos.push_back(p1);
+            pontos.push_back(p2);
+            pontos.push_back(p3);
+            pontos.push_back(p0);
+            //matrix[i][j] = make_tuple(x, y, z);
+        }
 
-            Triangle triangle1;
-            Triangle triangle2;
+    }
 
-			triangle1.pontos.push_back(p0);
-			triangle1.pontos.push_back(p1);
-			triangle1.pontos.push_back(p3);
-			triangle2.pontos.push_back(p2);
-			triangle2.pontos.push_back(p3);
-			triangle2.pontos.push_back(p0);
-
-            triangles.push_back(triangle1);
-            triangles.push_back(triangle2);
-			//matrix[i][j] = make_tuple(x, y, z);
-		}
-
-	}
-
-    /*
-	for (i = 0; i < stacks-1; i++) {
-		glBegin(GL_TRIANGLES);
-		for (int j = 1; j < slices-1; j++) {
-
-			//Triângulo da metade da esquerda
-			//glVertex3f(get<0>(matrix[i+1][j+1]), get<1>(matrix[i+1][j+1]), get<2>(matrix[i+1][j+1]));
-			//Triângulo da metade da direita
-			//glVertex3f(get<0>(matrix[i][j]), get<1>(matrix[i][j]), get<2>(matrix[i][j]));
-			//glVertex3f(get<0>(matrix[i+1][j]), get<1>(matrix[i+1][j]), get<2>(matrix[i+1][j]));
-			//glVertex3f(get<0>(matrix[i][j+1]), get<1>(matrix[i][j+1]), get<2>(matrix[i][j+1]));
-			//glVertex3f(get<0>(matrix[i][j]), get<1>(matrix[i][j]), get<2>(matrix[i][j]));
-			//glVertex3f(get<0>(matrix[i + 1][j + 1]), get<1>(matrix[i + 1][j + 1]), get<2>(matrix[i + 1][j + 1]));
-			}
-		glEnd();
-	}
-    */
-
-	glBegin(GL_TRIANGLES);
-	for (Triangle element : triangles) {
-		glVertex3f(element.pontos[0].p1,element.pontos[0].p2,element.pontos[0].p3);
-		glVertex3f(element.pontos[1].p1,element.pontos[1].p2,element.pontos[1].p3);
-		glVertex3f(element.pontos[2].p1,element.pontos[2].p2,element.pontos[2].p3);
-	}
-	glEnd();
-	//for (int i = 0; i < slices; ++i)
-		//delete[] matrix[i];
-	//delete[] matrix;
+    glBegin(GL_TRIANGLES);
+    for (auto& element : pontos) {
+        glVertex3f(get<0>(element), get<1>(element), get<2>(element));
+    }
+    glEnd();
 }
 
 void plane(int length, int divisions){
@@ -879,7 +845,7 @@ void renderScene(void) {
 	//plane(2,7);
 	//box(2,5);
 	//cone(1, 2, 20, 20);
-	sphere(1,30,30);
+	sphere(1,20,20);
 
 	//generate_plane(1,3,"plane.3d");
 	//generate_box(2,3,"box.3d");

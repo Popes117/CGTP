@@ -67,6 +67,11 @@ void spherical2Cartesian() {
 	camX = radius * cos(betA) * sin(alfa);
 	camY = radius * sin(betA);
 	camZ = radius * cos(betA) * cos(alfa);
+
+// Usa-mos isto quando for para mexer a câmara
+    //cameraX = radius * cos(betA) * sin(alfa);
+	//cameraY = radius * sin(betA);
+	//cameraZ = radius * cos(betA) * cos(alfa);
 }
 
 
@@ -169,15 +174,6 @@ std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
         }
     }
 
-    //std::cout << "Length: " << length << "\n";
-    //std::cout << "Divisions: " << divisions << "\n";
-    //std::cout << "Bottom triangles: " << triangles[0].size() << "\n";
-    //std::cout << "Top triangles: " << triangles[1].size() << "\n";
-    //std::cout << "Side1 triangles: " << triangles[2].size() << "\n";
-    //std::cout << "Side2 triangles: " << triangles[3].size() << "\n";
-    //std::cout << "Side3 triangles: " << triangles[4].size() << "\n";
-    //std::cout << "Side4 triangles: " << triangles[5].size() << "\n";
-
     return triangles;
 }
 
@@ -218,6 +214,42 @@ std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
             }
             triangles[count].push_back(triangle);
         }
+    }
+
+    return triangles;
+}
+
+std::vector<Triangle> parseSphere(const std::string& filename) {
+    int count = -1;
+
+	std::string first_line;
+    std::vector<Triangle> triangles;
+
+    std::ifstream file(filename);
+    char separador;
+
+    std::string linha;
+    
+    if (std::getline(file, linha)) {
+        std::istringstream iss(linha);
+        iss >> first_line;
+    }
+
+    while (std::getline(file, linha)) {
+        
+        if (linha.empty()) {
+            continue;
+        }
+
+        std::istringstream iss(linha);
+        Coordenadas ponto;
+        Triangle triangle;
+
+        while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
+            triangle.pontos.push_back(ponto);
+			iss >> separador;
+        }
+        triangles.push_back(triangle);
     }
 
     return triangles;
@@ -277,6 +309,23 @@ void draw_cone(const std::string& filename){
 
 }
 
+void draw_sphere(const std::string& filename) {
+
+    std::vector<Triangle> sphere_triangles = parseSphere(filename);
+ 
+    // body
+	glBegin(GL_TRIANGLES);
+    glColor3f(1.0f, 1.0f, 1.0f);
+	for(Triangle triangle : sphere_triangles){
+
+		glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
+    	glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
+		glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
+	}
+	glEnd();
+
+}
+
 void handle_form(const std::string& filename){
 	
     std::ifstream file(filename);
@@ -297,6 +346,9 @@ void handle_form(const std::string& filename){
     }
     else if (first_line == "cone") {
         draw_cone(filename);
+    }
+    else if (first_line == "sphere") {
+        draw_sphere(filename);
     }
 }
 
@@ -378,11 +430,6 @@ void processCameraElement(tinyxml2::XMLElement* cameraElement) {
     neaR = near;
     faR = far;
 
-    //Teste a imprimir para a consola a ver se leu bem
-    //std::cout << "Camera: Position(" << px << ", " << py << ", " << pz << "), ";
-    //std::cout << "LookAt(" << lx << ", " << ly << ", " << lz << "), ";
-    //std::cout << "Up(" << ux << ", " << uy << ", " << uz << "), ";
-    //std::cout << "Projection(FOV=" << fov << ", Near=" << near << ", Far=" << far << ")" << std::endl;
 }
  
 void processModelElement(tinyxml2::XMLElement* modelElement) {
@@ -390,7 +437,6 @@ void processModelElement(tinyxml2::XMLElement* modelElement) {
     filePath = "build/3DFiles/" + std::string(file);
     filePaths.push_back(filePath);
     if (file) {
-        //nao sei o que fazer com isto
         std::cout << "Model: File = " << file << std::endl;
     }
     else {
