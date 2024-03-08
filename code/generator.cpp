@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstring>
 
 #endif
 
@@ -463,9 +464,24 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 
 int main(int argc, char** argv){
 
-	generate_plane(1,3,"plane.3d");
-	generate_box(2,3,"box.3d");
-	generate_cone(1,2,20,20,"cone.3d");
+    if (argc < 2) {
+        std::cout << "Falta de Argumentos!";
+        return 1;
+    }
+
+    if (strcmp(argv[1], "plane") == 0) {
+		generate_plane(std::stoi(argv[2]),std::stoi(argv[3]),argv[4]);
+	}
+	else if (strcmp(argv[1], "box") == 0) {
+		generate_box(std::stoi(argv[2]),std::stoi(argv[3]),argv[4]);
+	}
+	else if (strcmp(argv[1], "cone") == 0) {
+		generate_cone(std::stof(argv[2]), std::stof(argv[3]),std::stoi(argv[4]), std::stoi(argv[5]),argv[6]);
+	}
+	else{
+        std::cout << "Erro ao abrir o arquivo!\n";
+		return 0;
+	}
 
 	return 1;
 }
