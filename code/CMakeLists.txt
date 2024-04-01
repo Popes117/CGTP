@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Project Name
-PROJECT(class4)
+PROJECT(engine)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(OpenGL_GL_PREFERENCE "GLVND")
 
-add_executable(${PROJECT_NAME} main.cpp)
+#add_library(Includes/common.cpp)
+#target_link_libraries(Includes)
+add_executable(${PROJECT_NAME} engine.cpp ../tinyxml2-master/tinyxml2.cpp)
+add_executable(generator generator.cpp)
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
@@ -66,11 +70,3 @@ else (WIN32) #Linux and Mac
 	endif(NOT GLUT_FOUND)
 	
 endif(WIN32)
-
-
-
-
-
-
-
-

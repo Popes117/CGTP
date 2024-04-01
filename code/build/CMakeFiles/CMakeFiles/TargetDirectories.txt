@@ -1,3 +1,0 @@
-C:/Users/zeedu/OneDrive/Ambiente de Trabalho/cg24/code/build/CMakeFiles/CMakeFiles/class4.dir
-C:/Users/zeedu/OneDrive/Ambiente de Trabalho/cg24/code/build/CMakeFiles/CMakeFiles/ALL_BUILD.dir
-C:/Users/zeedu/OneDrive/Ambiente de Trabalho/cg24/code/build/CMakeFiles/CMakeFiles/ZERO_CHECK.dir

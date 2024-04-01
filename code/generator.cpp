@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #ifdef __APPLE__
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #else
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -13,73 +13,25 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include "Includes/common.hpp"
 
 #endif
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-struct Coordenadas{
-	double p1, p2, p3;
-};
-
-struct Triangle{
-	std::vector<Coordenadas> pontos;
-};
-
 float alfa = 0.0f, betaa = 0.0f, radius = 5.0f;
 float camX, camY, camZ;
 using namespace std;
 
-void generate_plane(int length, int divisions, const std::string& filename){
+void put_object(vector<vector<Square>> parts, string shape,const std::string& filename){
+	std::ofstream file("3DFiles/" + filename);
 
-	float lado_length = (float)length / divisions;
-	float z = -((float)length / 2.0f);
-	vector<Triangle> plane_triangles;
-
-	for(int i = 0; i < divisions; i++){
-		float x = -((float)length / 2.0f);
-		int count = 0;
-
-		while(count < divisions){
-
-			//Triângulo da metade da esquerda
-			Triangle left_triangle;
-
-			Coordenadas coordenadas1 = {x, 0.0f, z};
-			left_triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {x, 0.0f, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x + lado_length, 0.0f, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas3);
-			plane_triangles.push_back(left_triangle);
-			
-			//Triângulo da metade da direita
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {x + lado_length, 0.0f, z + lado_length};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, 0.0f, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, 0.0f, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			plane_triangles.push_back(right_triangle);	
-
-			x += lado_length;
-			count += 1;
-		}
-		z += lado_length;
-	}
-
-	std::ofstream file("build/3DFiles/" + filename);
-
-    // Verifica se o arquivo foi aberto corretamente
     if (file.is_open()) {
-        // Escreve no arquivo
-        file << "plane" << "\n\n";
+        file << shape << "\n\n";
 
-			for(Triangle triangle : plane_triangles){
-				//for(Coordenadas ponto : triangle.pontos){
+		for(vector<Square> triangles : parts){
+			for(Square triangle : triangles){
 				for(int i = 0; i < triangle.pontos.size(); ++i){
 					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
 					    if (i < triangle.pontos.size() - 1) { 
@@ -90,15 +42,50 @@ void generate_plane(int length, int divisions, const std::string& filename){
 				}
 				file << "\n";
 			}
-		
-        // Fecha o arquivo
+			file << "\n";
+		}
+
         file.close();
-        std::cout << "Texto escrito com sucesso no arquivo.\n";
+        std::cout << "Texto escrito com sucesso no ficheiro!\n";
     } else {
-        // Se houver algum erro ao abrir o arquivo
-        std::cerr << "Erro ao abrir o arquivo.\n";
+        std::cerr << "Erro ao abrir o ficheiro!\n";
     }
 
+}
+
+void generate_plane(int length, int divisions, const std::string& filename){
+
+	float lado_length = (float)length / divisions;
+	float z = -((float)length / 2.0f);
+	vector<Square> plane_triangles;
+
+	for(int i = 0; i < divisions; i++){
+		float x = -((float)length / 2.0f);
+		int count = 0;
+
+		while(count < divisions){
+
+			//Triângulo da metade da esquerda
+			Square square;
+
+			Coordenadas coordenadas1 = {x, 0.0f, z};
+			square.pontos.push_back(coordenadas1);
+			Coordenadas coordenadas2 = {x, 0.0f, z + lado_length};
+			square.pontos.push_back(coordenadas2);
+			Coordenadas coordenadas3 = {x + lado_length, 0.0f, z + lado_length};
+			square.pontos.push_back(coordenadas3);
+			Coordenadas coordenadas5 = {x + lado_length, 0.0f, z};
+
+			plane_triangles.push_back(square);
+
+			x += lado_length;
+			count += 1;
+		}
+		z += lado_length;
+	}
+	vector<vector<Square>> squared;
+	squared.push_back(plane_triangles);
+	put_object(squared, "plane", filename);
 }
 
 void generate_box(int length, int divisions, const std::string& filename){
@@ -313,7 +300,7 @@ void generate_box(int length, int divisions, const std::string& filename){
 			right_triangle.pontos.push_back(coordenadas5);
 			Coordenadas coordenadas6 = {x, y, z};
 			right_triangle.pontos.push_back(coordenadas6);
-			side4.push_back(right_triangle);	
+			side4.push_back(right_triangle);
 
 			x += lado_length;
 			count += 1;
@@ -328,7 +315,7 @@ void generate_box(int length, int divisions, const std::string& filename){
 	box_parts.push_back(side3);
 	box_parts.push_back(side4);
 
-	std::ofstream file("build/3DFiles/" + filename);
+	std::ofstream file("3DFiles/" + filename);
 
     if (file.is_open()) {
         file << "box" << "\n\n";
@@ -360,17 +347,17 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 	int i;
 	float step;
 	float n_stacks;
-	vector<vector<Triangle>> cone_parts;
+	vector<vector<Square>> cone_parts;
 	step = 360.0 / slices;
 	n_stacks = height/stacks;
 
-	vector<Triangle> bottom;
-	vector<Triangle> stack;
-	vector<Triangle> body;
+	vector<Square> bottom;
+	vector<Square> stack;
+	vector<Square> body;
 	// bottom
 	for (i = 0; i < slices; i++) {
 
-		Triangle triangle;
+		Square triangle;
 		
 		Coordenadas coordenadas1 = {0, 0, 0};
 		triangle.pontos.push_back(coordenadas1);
@@ -388,7 +375,7 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 		
 		//Triângulos da primeira stack
 
-		Triangle triangle;
+		Square triangle;
 
 		Coordenadas coordenadas1 = {0.0f,height,0.0f};
 		triangle.pontos.push_back(coordenadas1);
@@ -401,56 +388,24 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 		for(int j = 1; j < stacks; j++){
 
 			//Triângulo da metade da esquerda
-			Triangle left_triangle;
+			Square triangle;
 
 			Coordenadas coordenadas1 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j)};
-			left_triangle.pontos.push_back(coordenadas1);
+			triangle.pontos.push_back(coordenadas1);
 			Coordenadas coordenadas2 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin(i * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
-			left_triangle.pontos.push_back(coordenadas2);
+			triangle.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
-			left_triangle.pontos.push_back(coordenadas3);
-			body.push_back(left_triangle);
-			
-			//Triângulo da metade da direita
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j)};
-			right_triangle.pontos.push_back(coordenadas4);
+			triangle.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas5 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j)};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
-			right_triangle.pontos.push_back(coordenadas6);
-			body.push_back(right_triangle);	
+			triangle.pontos.push_back(coordenadas5);
+
+			body.push_back(triangle);	
 		}
 	}
 	cone_parts.push_back(stack);
 	cone_parts.push_back(body);
 
-	std::ofstream file("build/3DFiles/" + filename);
-
-    if (file.is_open()) {
-        file << "cone" << "\n\n";
-
-		for(vector<Triangle> triangles : cone_parts){
-			for(Triangle triangle : triangles){
-				for(int i = 0; i < triangle.pontos.size(); ++i){
-					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
-					    if (i < triangle.pontos.size() - 1) { 
-        				    file << " ; ";
-        				} else {
-        				    file << " "; 
-        				}
-				}
-				file << "\n";
-			}
-			file << "\n";
-		}
-
-        file.close();
-        std::cout << "Texto escrito com sucesso no ficheiro!\n";
-    } else {
-        std::cerr << "Erro ao abrir o ficheiro!\n";
-    }
+	put_object(cone_parts, "cone", filename);
 
 }
 
@@ -461,7 +416,7 @@ void generate_sphere(double radius, int slices, int stacks, const std::string& f
 
     step = 2* M_PI / slices; 
     n_stacks = M_PI / stacks;
-    vector<Triangle> sphere_triangles;
+    vector<Square> sphere_triangles;
  
     // body
     for (i = 0; i < slices; i++) {
@@ -476,43 +431,20 @@ void generate_sphere(double radius, int slices, int stacks, const std::string& f
             Coordenadas p2 = { (radius * sin(currentStack) * sin(nextSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(nextSlice)) };
             Coordenadas p3 = { (radius * sin(currentStack) * sin(currentSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(currentSlice)) };
 
-            Triangle left;
-            Triangle right;
+            Square square;
 
-            left.pontos.push_back(p0);
-            left.pontos.push_back(p3);
-            left.pontos.push_back(p1);
-            right.pontos.push_back(p2);
-            right.pontos.push_back(p3);
-            right.pontos.push_back(p0);
+            square.pontos.push_back(p0);
+            square.pontos.push_back(p3);
+            square.pontos.push_back(p1);
+            square.pontos.push_back(p2);
 
-			sphere_triangles.push_back(left);
-			sphere_triangles.push_back(right);		
+			sphere_triangles.push_back(square);	
         }
     }
 
-	std::ofstream file("build/3DFiles/" + filename);
-
-    if (file.is_open()) {
-        file << "sphere" <<  "\n\n";
-
-			for(Triangle triangle : sphere_triangles){
-				for(int i = 0; i < triangle.pontos.size(); ++i){
-					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
-					    if (i < triangle.pontos.size() - 1) { 
-        				    file << " ; ";
-        				} else {
-        				    file << " "; 
-        				}
-				}
-				file << "\n";
-			}
-		
-        file.close();
-        std::cout << "Texto escrito com sucesso no ficheiro!.\n";
-    } else {
-        std::cerr << "Erro ao abrir o ficheiro!.\n";
-    }
+	vector<vector<Square>> squared;
+	squared.push_back(sphere_triangles);
+	put_object(squared, "sphere", filename);
 }
 
 int main(int argc, char** argv){

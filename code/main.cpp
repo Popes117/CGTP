@@ -844,8 +844,8 @@ void renderScene(void) {
 	//cylinder0(1,2,10);
 	//plane(2,7);
 	//box(2,5);
-	//cone(1, 2, 20, 20);
-	sphere(1,20,20);
+	cone(1, 2, 20, 20);
+	//sphere(1,20,20);
 
 	//generate_plane(1,3,"plane.3d");
 	//generate_box(2,3,"box.3d");
