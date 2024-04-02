@@ -25,7 +25,7 @@ float camX, camY, camZ;
 using namespace std;
 
 void put_object(vector<vector<Square>> parts, string shape,const std::string& filename){
-	std::ofstream file("3DFiles/" + filename);
+	std::ofstream file("../build/3DFiles/" + filename);
 
     if (file.is_open()) {
         file << shape << "\n\n";
@@ -87,20 +87,20 @@ void generate_plane(int length, int divisions, const std::string& filename){
 	squared.push_back(plane_triangles);
 	put_object(squared, "plane", filename);
 }
-
+/*
 void generate_box(int length, int divisions, const std::string& filename){
 
 	float lado_length = (float)length / divisions;
 	float z = -((float)length / 2.0f);
 	float y = -((float)length / 2.0f);
-	vector<vector<Triangle>> box_parts;
+	vector<vector<Square>> box_parts;
 
-	vector<Triangle> bottom;
-	vector<Triangle> top;
-	vector<Triangle> side1;
-	vector<Triangle> side2;
-	vector<Triangle> side3;
-	vector<Triangle> side4;
+	vector<Square> bottom;
+	vector<Square> top;
+	vector<Square> side1;
+	vector<Square> side2;
+	vector<Square> side3;
+	vector<Square> side4;
 
 	//Base de baixo
 	for(int i = 0; i < divisions; i++){
@@ -109,25 +109,18 @@ void generate_box(int length, int divisions, const std::string& filename){
 
 		while(count < divisions){
 
-			Triangle left_triangle;
+			Square square;
 
 			Coordenadas coordenadas1 = {x, y, z};
-			left_triangle.pontos.push_back(coordenadas1);
+			square.pontos.push_back(coordenadas1);
 			Coordenadas coordenadas2 = {x, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas2);
+			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x + lado_length, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas3);
-			bottom.push_back(left_triangle);
-			
-			Triangle right_triangle;
+			square.pontos.push_back(coordenadas3);
+			Coordenadas coordenadas4 = {x + lado_length, y, z};
+			square.pontos.push_back(coordenadas4);
 
-			Coordenadas coordenadas4 = {x + lado_length, y, z + lado_length};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, y, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, y, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			bottom.push_back(right_triangle);	
+			bottom.push_back(square);			
 
 			x += lado_length;
 			count += 1;
@@ -341,7 +334,7 @@ void generate_box(int length, int divisions, const std::string& filename){
         std::cerr << "Erro ao abrir o ficheiro!.\n";
     }
 }
-
+*/
 void generate_cone(float radius, float height, int slices,int stacks, const std::string& filename) {
 
 	int i;
@@ -458,7 +451,7 @@ int main(int argc, char** argv){
 		generate_plane(std::stoi(argv[2]),std::stoi(argv[3]),argv[4]);
 	}
 	else if (strcmp(argv[1], "box") == 0) {
-		generate_box(std::stoi(argv[2]),std::stoi(argv[3]),argv[4]);
+		//generate_box(std::stoi(argv[2]),std::stoi(argv[3]),argv[4]);
 	}
 	else if (strcmp(argv[1], "cone") == 0) {
 		generate_cone(std::stof(argv[2]), std::stof(argv[3]),std::stoi(argv[4]), std::stoi(argv[5]),argv[6]);

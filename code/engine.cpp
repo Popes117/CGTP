@@ -443,7 +443,7 @@ void processCameraElement(tinyxml2::XMLElement* cameraElement) {
  
 void processModelElement(tinyxml2::XMLElement* modelElement) {
     const char* file = modelElement->Attribute("file");
-    filePath = "3DFiles/" + std::string(file);
+    filePath = "build/3DFiles/" + std::string(file);
     filePaths.push_back(filePath);
     if (file) {
         std::cout << "Model: File = " << file << std::endl;

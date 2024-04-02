@@ -1,4 +1,4 @@
-/home/wally/cg24/cg24/code/build/CMakeFiles/engine.dir
-/home/wally/cg24/cg24/code/build/CMakeFiles/generator.dir
-/home/wally/cg24/cg24/code/build/CMakeFiles/edit_cache.dir
-/home/wally/cg24/cg24/code/build/CMakeFiles/rebuild_cache.dir
+/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/build/CMakeFiles/engine.dir
+/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/build/CMakeFiles/generator.dir
+/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/build/CMakeFiles/edit_cache.dir
+/home/popes/Desktop/3ºAno 2ºSemestre/cg24/code/build/CMakeFiles/rebuild_cache.dir

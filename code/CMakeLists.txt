@@ -8,7 +8,7 @@ set(OpenGL_GL_PREFERENCE "GLVND")
 
 #add_library(Includes/common.cpp)
 #target_link_libraries(Includes)
-add_executable(${PROJECT_NAME} engine.cpp ../tinyxml2-master/tinyxml2.cpp)
+add_executable(engine engine.cpp tinyxml2-master/tinyxml2.cpp)
 add_executable(generator generator.cpp)
 
 find_package(OpenGL REQUIRED)
