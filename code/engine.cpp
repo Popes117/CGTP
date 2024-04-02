@@ -440,11 +440,63 @@ void processCameraElement(tinyxml2::XMLElement* cameraElement) {
     faR = far;
 
 }
+
+void processColorElement(tinyxml2::XMLElement* colorElement) {
+    float dr, dg, db, ar, ag, ab, sr, sg, sb, er, eg, eb, value;
+
+    for (tinyxml2::XMLElement* child = colorElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+        const char* childName = child->Name();
+
+        if (strcmp(childName, "diffuse") == 0) {
+            child->QueryFloatAttribute("R", &dr);
+            child->QueryFloatAttribute("g", &dg);
+            child->QueryFloatAttribute("b", &db);
+        }
+        else if (strcmp(childName, "ambient") == 0) {
+            child->QueryFloatAttribute("R", &ar);
+            child->QueryFloatAttribute("g", &ag);
+            child->QueryFloatAttribute("b", &ab);
+        }
+        else if (strcmp(childName, "specular") == 0) {
+            child->QueryFloatAttribute("R", &sr);
+            child->QueryFloatAttribute("g", &sg);
+            child->QueryFloatAttribute("b", &sb);
+        }
+        else if (strcmp(childName, "shininess") == 0) {
+            child->QueryFloatAttribute("value", &value);
+        }
+    }
+
+    // guardar em variaveis globais
+}
+
+void processTextureElement(tinyxml2::XMLElement* textureElement) {
+    const char* file = textureElement->Attribute("file");
+    filePath = "build/3DFiles/" + std::string(file);
+    filePaths.push_back(filePath);
+
+    if (file) {
+        std::cout << "Model: File = " << file << std::endl;
+    }
+    else {
+        std::cerr << "Model element is missing the 'file' attribute." << std::endl;
+    }
+}
  
 void processModelElement(tinyxml2::XMLElement* modelElement) {
     const char* file = modelElement->Attribute("file");
     filePath = "build/3DFiles/" + std::string(file);
     filePaths.push_back(filePath);
+
+    /*
+    if (strcmp(childName, "color") == 0) {
+        processColorElement(child);
+    }
+
+    if (strcmp(childName, "texture") == 0) {
+        processTextureElement(child);
+    }
+    */
     if (file) {
         std::cout << "Model: File = " << file << std::endl;
     }
@@ -458,6 +510,35 @@ void processModelsElement(tinyxml2::XMLElement* modelsElement) {
         processModelElement(modelElement);
     }
 }
+
+void processTransformElement(tinyxml2::XMLElement* transformElement) {
+    float tx, ty, tz, rx, ry, rz, sx, sy, sz, angle;
+
+    for (tinyxml2::XMLElement* child = transformElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+        const char* childName = child->Name();
+
+        if (strcmp(childName, "translate") == 0) {
+            child->QueryFloatAttribute("x", &tx);
+            child->QueryFloatAttribute("y", &ty);
+            child->QueryFloatAttribute("z", &tz);
+        }
+        else if (strcmp(childName, "rotate") == 0) {
+            child->QueryFloatAttribute("angle", &angle);
+            child->QueryFloatAttribute("x", &rx);
+            child->QueryFloatAttribute("y", &ry);
+            child->QueryFloatAttribute("z", &rz);
+        }
+        else if (strcmp(childName, "scale") == 0) {
+            child->QueryFloatAttribute("x", &sx);
+            child->QueryFloatAttribute("y", &sy);
+            child->QueryFloatAttribute("z", &sz);
+        }
+    }
+
+    // guardar em variaveis globais
+}
+
+
  
 void processGroupElement(tinyxml2::XMLElement* groupElement) {
     for (tinyxml2::XMLElement* child = groupElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
@@ -466,10 +547,44 @@ void processGroupElement(tinyxml2::XMLElement* groupElement) {
         if (strcmp(childName, "models") == 0) {
             processModelsElement(child);
         }
+
+        if (strcmp(childName, "transform") == 0) {
+            processTransformElement(child);
+        }
         //Adicione mais condições conforme necessário para outros tipos de elementos dentro de 'group'
     }
 }
  
+void processLightElement(tinyxml2::XMLElement* lightElement) {
+    float px, py, pz, dx, dy, dz, sx, sy, sz, sdx, sdy, sdz, c;
+
+    for (tinyxml2::XMLElement* child = lightElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+        const char* childName = child->Name();
+
+        if (strcmp(childName, "point") == 0) {
+            child->QueryFloatAttribute("posX", &px);
+            child->QueryFloatAttribute("posY", &py);
+            child->QueryFloatAttribute("posZ", &pz);
+        }
+        else if (strcmp(childName, "directional") == 0) {
+            child->QueryFloatAttribute("dirX", &dx);
+            child->QueryFloatAttribute("dirY", &dy);
+            child->QueryFloatAttribute("dirZ", &dz);
+        }
+        else if (strcmp(childName, "spotlight") == 0) {
+            child->QueryFloatAttribute("posX", &sx);
+            child->QueryFloatAttribute("posY", &sy);
+            child->QueryFloatAttribute("posZ", &sz);
+            child->QueryFloatAttribute("dirX", &sdx);
+            child->QueryFloatAttribute("dirY", &sdy);
+            child->QueryFloatAttribute("dirZ", &sdz);
+            child->QueryFloatAttribute("cutoff", &c);
+        }
+    }
+
+    // guardar em variaveis globais
+}
+
 void processWorldElement(tinyxml2::XMLElement* worldElement) {
     for (tinyxml2::XMLElement* child = worldElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
@@ -483,7 +598,9 @@ void processWorldElement(tinyxml2::XMLElement* worldElement) {
         else if (strcmp(childName, "group") == 0) {
             processGroupElement(child);
         }
-        //Falta light e transform para o futuro
+        else if (strcmp(childName, "light") == 0) {
+            processLightElement(child);
+        }
     }
 }
  
