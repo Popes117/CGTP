@@ -1,3 +1,4 @@
 /code/build
 /code/.vscode
 /code/.idea
+/code/build/CMakeCache.txt
