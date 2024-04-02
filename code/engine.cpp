@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #ifdef __APPLE__
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #else
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include "tinyxml2-master/tinyxml2.h"
+#include "Includes/common.hpp"
 
 #endif
 
@@ -51,14 +52,6 @@ int length_form;
 int divisions_form;
 
 int opcao;
-
-struct Coordenadas{
-	double p1, p2, p3;
-};
-
-struct Triangle{
-	std::vector<Coordenadas> pontos;
-};
 
 using namespace std;
 
@@ -100,10 +93,10 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-std::vector<Triangle> parsePlane(const std::string& filename) {
+std::vector<Square> parsePlane(const std::string& filename) {
 
 	std::string first_line;
-    std::vector<Triangle> triangles;
+    std::vector<Square> triangles;
 	std::ifstream file(filename);
 	char separador;
     
@@ -122,13 +115,13 @@ std::vector<Triangle> parsePlane(const std::string& filename) {
 
         std::istringstream iss(linha);
         Coordenadas ponto;
-        Triangle triangle;
+        Square square;
 
         while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
-            triangle.pontos.push_back(ponto);
+            square.pontos.push_back(ponto);
 			iss >> separador;
         }
-        triangles.push_back(triangle);
+        triangles.push_back(square);
     }
 
 	return triangles;
@@ -177,7 +170,7 @@ std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
     return triangles;
 }
 
-std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
+std::vector<std::vector<Square>> parseCone(const std::string& filename) {
     
     std::string first_line;
     float radius; 
@@ -186,10 +179,10 @@ std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
     int stacks;
     int count = -1;
 
-    std::vector<std::vector<Triangle>> triangles;
-    triangles.push_back(std::vector<Triangle>()); // Bottom
-    triangles.push_back(std::vector<Triangle>()); // Stack
-    triangles.push_back(std::vector<Triangle>()); // Body
+    std::vector<std::vector<Square>> triangles;
+    triangles.push_back(std::vector<Square>()); // Bottom
+    triangles.push_back(std::vector<Square>()); // Stack
+    triangles.push_back(std::vector<Square>()); // Body
 
     std::ifstream file(filename);
     char separador;
@@ -206,7 +199,7 @@ std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
         } else {
             std::istringstream iss(linha);
             Coordenadas ponto;
-            Triangle triangle;
+            Square triangle;
 
             while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
                 triangle.pontos.push_back(ponto);
@@ -219,11 +212,11 @@ std::vector<std::vector<Triangle>> parseCone(const std::string& filename) {
     return triangles;
 }
 
-std::vector<Triangle> parseSphere(const std::string& filename) {
+std::vector<Square> parseSphere(const std::string& filename) {
     int count = -1;
 
 	std::string first_line;
-    std::vector<Triangle> triangles;
+    std::vector<Square> triangles;
 
     std::ifstream file(filename);
     char separador;
@@ -243,7 +236,7 @@ std::vector<Triangle> parseSphere(const std::string& filename) {
 
         std::istringstream iss(linha);
         Coordenadas ponto;
-        Triangle triangle;
+        Square triangle;
 
         while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
             triangle.pontos.push_back(ponto);
@@ -257,15 +250,18 @@ std::vector<Triangle> parseSphere(const std::string& filename) {
 
 void draw_plane(const std::string& filename){
 
-    std::vector<Triangle> plane_triangles = parsePlane(filename);
+    std::vector<Square> plane_triangles = parsePlane(filename);
 	
 	glBegin(GL_TRIANGLES);
     glColor3f(1.0f, 1.0f, 1.0f);
-	for(Triangle triangle : plane_triangles){
+	for(Square square : plane_triangles){
 
-		glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-    	glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-		glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
+		glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3); 
+    	glVertex3f(square.pontos[1].p1,square.pontos[1].p2, square.pontos[1].p3); 
+		glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3); 
+        glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3); 
+    	glVertex3f(square.pontos[3].p1,square.pontos[3].p2, square.pontos[3].p3); 
+		glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3); 
 	}
 	glEnd();
 
@@ -292,16 +288,25 @@ void draw_box(const std::string& filename){
 
 void draw_cone(const std::string& filename){
 
-	std::vector<std::vector<Triangle>> cone_triangles = parseCone(filename);
+	std::vector<std::vector<Square>> cone_triangles = parseCone(filename);
 	
 	glBegin(GL_TRIANGLES);
     glColor3f(1.0f, 1.0f, 1.0f);
-	for(std::vector<Triangle> triangles : cone_triangles){
-		for(Triangle triangle : triangles){
-
-			glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-    		glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-			glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
+	for(std::vector<Square> triangles : cone_triangles){
+		for(Square triangle : triangles){
+            if(triangle.pontos.size() == 3){
+                glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
+    		    glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
+			    glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3);
+            }
+            else{
+                glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
+    		    glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
+			    glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3);
+                glVertex3f(triangle.pontos[3].p1,triangle.pontos[3].p2, triangle.pontos[3].p3); 
+    		    glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
+			    glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3);
+            }
 
 		}
 	}
@@ -311,16 +316,19 @@ void draw_cone(const std::string& filename){
 
 void draw_sphere(const std::string& filename) {
 
-    std::vector<Triangle> sphere_triangles = parseSphere(filename);
+    std::vector<Square> sphere_triangles = parseSphere(filename);
  
     // body
 	glBegin(GL_TRIANGLES);
     glColor3f(1.0f, 1.0f, 1.0f);
-	for(Triangle triangle : sphere_triangles){
+	for(Square triangle : sphere_triangles){
 
 		glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
     	glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
 		glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
+        glVertex3f(triangle.pontos[3].p1,triangle.pontos[3].p2, triangle.pontos[3].p3); 
+    	glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
+		glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
 	}
 	glEnd();
 
@@ -338,6 +346,7 @@ void handle_form(const std::string& filename){
         iss >> first_line;
     }
 
+    std::cout << filename << "\n";
     if (first_line == "plane") {
         draw_plane(filename);
     }

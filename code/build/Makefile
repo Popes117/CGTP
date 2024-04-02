@@ -117,41 +117,102 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named class4
+# Target rules for targets named engine
 
 # Build rule for target.
-class4: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 class4
-.PHONY : class4
+engine: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 engine
+.PHONY : engine
 
 # fast build rule for target.
-class4/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/build
-.PHONY : class4/fast
+engine/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/engine.dir/build.make CMakeFiles/engine.dir/build
+.PHONY : engine/fast
 
-main.o: main.cpp.o
-.PHONY : main.o
+#=============================================================================
+# Target rules for targets named generator
+
+# Build rule for target.
+generator: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 generator
+.PHONY : generator
+
+# fast build rule for target.
+generator/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/generator.dir/build.make CMakeFiles/generator.dir/build
+.PHONY : generator/fast
+
+engine.o: engine.cpp.o
+.PHONY : engine.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/main.cpp.o
-.PHONY : main.cpp.o
+engine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/engine.dir/build.make CMakeFiles/engine.dir/engine.cpp.o
+.PHONY : engine.cpp.o
 
-main.i: main.cpp.i
-.PHONY : main.i
+engine.i: engine.cpp.i
+.PHONY : engine.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/main.cpp.i
-.PHONY : main.cpp.i
+engine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/engine.dir/build.make CMakeFiles/engine.dir/engine.cpp.i
+.PHONY : engine.cpp.i
 
-main.s: main.cpp.s
-.PHONY : main.s
+engine.s: engine.cpp.s
+.PHONY : engine.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/class4.dir/build.make CMakeFiles/class4.dir/main.cpp.s
-.PHONY : main.cpp.s
+engine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/engine.dir/build.make CMakeFiles/engine.dir/engine.cpp.s
+.PHONY : engine.cpp.s
+
+generator.o: generator.cpp.o
+.PHONY : generator.o
+
+# target to build an object file
+generator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/generator.dir/build.make CMakeFiles/generator.dir/generator.cpp.o
+.PHONY : generator.cpp.o
+
+generator.i: generator.cpp.i
+.PHONY : generator.i
+
+# target to preprocess a source file
+generator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/generator.dir/build.make CMakeFiles/generator.dir/generator.cpp.i
+.PHONY : generator.cpp.i
+
+generator.s: generator.cpp.s
+.PHONY : generator.s
+
+# target to generate assembly for a file
+generator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/generator.dir/build.make CMakeFiles/generator.dir/generator.cpp.s
+.PHONY : generator.cpp.s
+
+tinyxml2-master/tinyxml2.o: tinyxml2-master/tinyxml2.cpp.o
+.PHONY : tinyxml2-master/tinyxml2.o
+
+# target to build an object file
+tinyxml2-master/tinyxml2.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/engine.dir/build.make CMakeFiles/engine.dir/tinyxml2-master/tinyxml2.cpp.o
+.PHONY : tinyxml2-master/tinyxml2.cpp.o
+
+tinyxml2-master/tinyxml2.i: tinyxml2-master/tinyxml2.cpp.i
+.PHONY : tinyxml2-master/tinyxml2.i
+
+# target to preprocess a source file
+tinyxml2-master/tinyxml2.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/engine.dir/build.make CMakeFiles/engine.dir/tinyxml2-master/tinyxml2.cpp.i
+.PHONY : tinyxml2-master/tinyxml2.cpp.i
+
+tinyxml2-master/tinyxml2.s: tinyxml2-master/tinyxml2.cpp.s
+.PHONY : tinyxml2-master/tinyxml2.s
+
+# target to generate assembly for a file
+tinyxml2-master/tinyxml2.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/engine.dir/build.make CMakeFiles/engine.dir/tinyxml2-master/tinyxml2.cpp.s
+.PHONY : tinyxml2-master/tinyxml2.cpp.s
 
 # Help Target
 help:
@@ -161,10 +222,17 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... class4"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... engine"
+	@echo "... generator"
+	@echo "... engine.o"
+	@echo "... engine.i"
+	@echo "... engine.s"
+	@echo "... generator.o"
+	@echo "... generator.i"
+	@echo "... generator.s"
+	@echo "... tinyxml2-master/tinyxml2.o"
+	@echo "... tinyxml2-master/tinyxml2.i"
+	@echo "... tinyxml2-master/tinyxml2.s"
 .PHONY : help
 
 
