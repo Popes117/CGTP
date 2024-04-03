@@ -68,6 +68,9 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "codecvt": "cpp",
+        "source_location": "cpp",
+        "stdfloat": "cpp"
     }
 }

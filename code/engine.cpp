@@ -127,20 +127,20 @@ std::vector<Square> parsePlane(const std::string& filename) {
 	return triangles;
 }
 
-std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
+std::vector<std::vector<Square>> parseBox(const std::string& filename) {
     
     std::string first_line;
     int length;
     int divisions;
     int count = -1;
 
-    std::vector<std::vector<Triangle>> triangles;
-    triangles.push_back(std::vector<Triangle>()); // Bottom
-    triangles.push_back(std::vector<Triangle>()); // Top
-    triangles.push_back(std::vector<Triangle>()); // Side1
-    triangles.push_back(std::vector<Triangle>()); // Side2
-    triangles.push_back(std::vector<Triangle>()); // Side3
-    triangles.push_back(std::vector<Triangle>()); // Side4
+    std::vector<std::vector<Square>> squares;
+    squares.push_back(std::vector<Square>()); // Bottom
+    squares.push_back(std::vector<Square>()); // Top
+    squares.push_back(std::vector<Square>()); // Side1
+    squares.push_back(std::vector<Square>()); // Side2
+    squares.push_back(std::vector<Square>()); // Side3
+    squares.push_back(std::vector<Square>()); // Side4
 
     std::ifstream file(filename);
     char separador;
@@ -157,17 +157,17 @@ std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
         } else {
             std::istringstream iss(linha);
             Coordenadas ponto;
-            Triangle triangle;
+            Square square;
 
             while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
-                triangle.pontos.push_back(ponto);
+                square.pontos.push_back(ponto);
                 iss >> separador;
             }
-            triangles[count].push_back(triangle);
+            squares[count].push_back(square);
         }
     }
 
-    return triangles;
+    return squares;
 }
 
 std::vector<std::vector<Square>> parseCone(const std::string& filename) {
@@ -269,16 +269,19 @@ void draw_plane(const std::string& filename){
 
 void draw_box(const std::string& filename){
 
-	std::vector<std::vector<Triangle>> box_triangles = parseBox(filename);
+	std::vector<std::vector<Square>> box_squares = parseBox(filename);
 	
 	glBegin(GL_TRIANGLES);
     glColor3f(1.0f, 1.0f, 1.0f);
-	for(std::vector<Triangle> triangles : box_triangles){
-		for(Triangle triangle : triangles){
+	for(std::vector<Square> squares : box_squares){
+		for(Square square : squares){
 
-			glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-    		glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-			glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
+			glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3); 
+    		glVertex3f(square.pontos[1].p1,square.pontos[1].p2, square.pontos[1].p3); 
+			glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3);
+            glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3); 
+    	    glVertex3f(square.pontos[3].p1,square.pontos[3].p2, square.pontos[3].p3); 
+		    glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3);  
 
 		}
 	}
@@ -337,6 +340,10 @@ void draw_sphere(const std::string& filename) {
 void handle_form(const std::string& filename){
 	
     std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo: " << filename << std::endl;
+        return; // ou faça alguma outra coisa para lidar com o erro
+    }
 	std::string first_line;
     
     std::string linha;
@@ -346,7 +353,6 @@ void handle_form(const std::string& filename){
         iss >> first_line;
     }
 
-    std::cout << filename << "\n";
     if (first_line == "plane") {
         draw_plane(filename);
     }
@@ -472,7 +478,7 @@ void processColorElement(tinyxml2::XMLElement* colorElement) {
 
 void processTextureElement(tinyxml2::XMLElement* textureElement) {
     const char* file = textureElement->Attribute("file");
-    filePath = "build/3DFiles/" + std::string(file);
+    filePath = "3DFiles/" + std::string(file);
     filePaths.push_back(filePath);
 
     if (file) {
@@ -485,7 +491,7 @@ void processTextureElement(tinyxml2::XMLElement* textureElement) {
  
 void processModelElement(tinyxml2::XMLElement* modelElement) {
     const char* file = modelElement->Attribute("file");
-    filePath = "build/3DFiles/" + std::string(file);
+    filePath = "3DFiles/" + std::string(file);
     filePaths.push_back(filePath);
 
     /*
