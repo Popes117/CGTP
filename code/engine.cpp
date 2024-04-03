@@ -25,6 +25,7 @@ float camX, camY, camZ;
 
 std::string filePath;
 std::vector<std::string> filePaths;
+std::vector<Transform> vetor_de_transformaçoes;
 
 int widtH;
 int heighT;
@@ -54,6 +55,16 @@ int divisions_form;
 int opcao;
 
 using namespace std;
+
+void new_Transform(string type, float angle, float x, float y, float z){
+    Transform transform;
+    transform.type = type;
+    transform.angle = angle;
+    transform.x = x;
+    transform.y = y;
+    transform.z = z;
+    vetor_de_transformaçoes.push_back(transform);
+}
 
 void spherical2Cartesian() {
 
@@ -517,8 +528,10 @@ void processModelsElement(tinyxml2::XMLElement* modelsElement) {
     }
 }
 
-void processTransformElement(tinyxml2::XMLElement* transformElement) {
+int processTransformElement(tinyxml2::XMLElement* transformElement) {
+
     float tx, ty, tz, rx, ry, rz, sx, sy, sz, angle;
+    int n_transforms = 0;
 
     for (tinyxml2::XMLElement* child = transformElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
@@ -527,26 +540,34 @@ void processTransformElement(tinyxml2::XMLElement* transformElement) {
             child->QueryFloatAttribute("x", &tx);
             child->QueryFloatAttribute("y", &ty);
             child->QueryFloatAttribute("z", &tz);
+            new_Transform("translate", 0, tx, ty, tz);
         }
         else if (strcmp(childName, "rotate") == 0) {
             child->QueryFloatAttribute("angle", &angle);
             child->QueryFloatAttribute("x", &rx);
             child->QueryFloatAttribute("y", &ry);
             child->QueryFloatAttribute("z", &rz);
+            new_Transform("rotate", angle, rx, ry, rz);
         }
         else if (strcmp(childName, "scale") == 0) {
             child->QueryFloatAttribute("x", &sx);
             child->QueryFloatAttribute("y", &sy);
             child->QueryFloatAttribute("z", &sz);
+            new_Transform("scale", 0, sx, sy, sz);
         }
+        n_transforms++;
     }
 
+    return n_transforms;
     // guardar em variaveis globais
 }
 
 
  
 void processGroupElement(tinyxml2::XMLElement* groupElement) {
+    
+    int n_transforms = 0;
+    
     for (tinyxml2::XMLElement* child = groupElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
  
@@ -555,9 +576,22 @@ void processGroupElement(tinyxml2::XMLElement* groupElement) {
         }
 
         if (strcmp(childName, "transform") == 0) {
-            processTransformElement(child);
+            
+            int n = processTransformElement(child);
+            n_transforms += n;
+        }
+
+        if (strcmp(childName, "group") == 0) {
+            processGroupElement(child);
         }
         //Adicione mais condições conforme necessário para outros tipos de elementos dentro de 'group'
+    }
+
+    int arr_len = vetor_de_transformaçoes.size();
+    while(n_transforms > 0){
+        //fazer o reverso da transformaçao[arr_len - n_transforms]
+        vetor_de_transformaçoes.pop_back();
+        n_transforms--;
     }
 }
  

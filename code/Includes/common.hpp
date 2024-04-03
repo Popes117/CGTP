@@ -11,3 +11,8 @@ struct Triangle{
 struct Square{
 	std::vector<Coordenadas> pontos;
 };
+
+struct Transform{
+	string type;
+	float angle, x, y, z;
+};
