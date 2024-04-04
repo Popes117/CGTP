@@ -75,6 +75,7 @@ void generate_plane(int length, int divisions, const std::string& filename){
 			Coordenadas coordenadas3 = {x + lado_length, 0.0f, z + lado_length};
 			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas5 = {x + lado_length, 0.0f, z};
+			square.pontos.push_back(coordenadas5);
 
 			plane_triangles.push_back(square);
 
@@ -88,261 +89,7 @@ void generate_plane(int length, int divisions, const std::string& filename){
 	put_object(squared, "plane", filename);
 }
 
-void generate_box(int length, int divisions, const std::string& filename){
 
-	float lado_length = (float)length / divisions;
-	float z = -((float)length / 2.0f);
-	float y = -((float)length / 2.0f);
-	vector<vector<Triangle>> box_parts;
-
-	vector<Triangle> bottom;
-	vector<Triangle> top;
-	vector<Triangle> side1;
-	vector<Triangle> side2;
-	vector<Triangle> side3;
-	vector<Triangle> side4;
-
-	//Base de baixo
-	for(int i = 0; i < divisions; i++){
-		float x = -((float)length / 2.0f);
-		int count = 0;
-
-		while(count < divisions){
-
-			Triangle left_triangle;
-
-			Coordenadas coordenadas1 = {x, y, z};
-			left_triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {x, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x + lado_length, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas3);
-			bottom.push_back(left_triangle);
-			
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {x + lado_length, y, z + lado_length};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, y, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, y, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			bottom.push_back(right_triangle);	
-
-			x += lado_length;
-			count += 1;
-		}
-		z += lado_length;
-	}
-
-	//Base de cima
-	y = (float)length / 2.0f;
-	z = -((float)length / 2.0f);
-	for(int i = 0; i < divisions; i++){
-		float x = -((float)length / 2.0f);
-		int count = 0;
-
-		while(count < divisions){
-			
-			Triangle left_triangle;
-
-			Coordenadas coordenadas1 = {x, y, z};
-			left_triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {x, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x + lado_length, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas3);
-			top.push_back(left_triangle);
-			
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {x + lado_length, y, z + lado_length};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, y, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, y, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			top.push_back(right_triangle);	
-
-			x += lado_length;
-			count += 1;
-		}
-		z += lado_length;
-	}
-
-	// Bases Laterais de acordo com o eixo Z
-	float x = -((float)length / 2.0f);
-	y = -((float)length / 2.0f);
-	for(int i = 0; i < divisions; i++){
-		float z = -((float)length / 2.0f);
-		int count = 0;
-
-		while(count < divisions){
-
-			Triangle left_triangle;
-
-			Coordenadas coordenadas1 = {x, y, z};
-			left_triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {x, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x, y + lado_length, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas3);
-			side1.push_back(left_triangle);
-			
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			side1.push_back(right_triangle);	
-
-			z += lado_length;
-			count += 1;
-		}
-		y += lado_length;
-	}
-
-	x = (float)length / 2.0f;
-	y = -((float)length / 2.0f);
-	for(int i = 0; i < divisions; i++){
-		float z = -((float)length / 2.0f);
-		int count = 0;
-
-		while(count < divisions){
-
-			Triangle left_triangle;
-
-			Coordenadas coordenadas1 = {x, y, z};
-			left_triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {x, y, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x, y + lado_length, z + lado_length};
-			left_triangle.pontos.push_back(coordenadas3);
-			side2.push_back(left_triangle);
-			
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			side2.push_back(right_triangle);	
-
-			z += lado_length;
-			count += 1;
-		}
-		y += lado_length;
-	}
-
-	// Bases Laterais de acordo com o eixo X
-	z = -((float)length / 2.0f);
-	y = -((float)length / 2.0f);
-	for(int i = 0; i < divisions; i++){
-		float x = -((float)length / 2.0f);
-		int count = 0;
-
-		while(count < divisions){
-
-			Triangle left_triangle;
-
-			Coordenadas coordenadas1 = {x, y, z};
-			left_triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {x + lado_length, y, z};
-			left_triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x + lado_length, y + lado_length, z};
-			left_triangle.pontos.push_back(coordenadas3);
-			side3.push_back(left_triangle);
-			
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			side3.push_back(right_triangle);	
-
-			x += lado_length;
-			count += 1;
-		}
-		y += lado_length;
-	}
-
-	z = (float)length / 2.0f;
-	y = -((float)length / 2.0f);
-	for(int i = 0; i < divisions; i++){
-		float x = -((float)length / 2.0f);
-		int count = 0;
-
-		while(count < divisions){
-
-			Triangle left_triangle;
-
-			Coordenadas coordenadas1 = {x, y, z};
-			left_triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {x + lado_length, y, z};
-			left_triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x + lado_length, y + lado_length, z};
-			left_triangle.pontos.push_back(coordenadas3);
-			side4.push_back(left_triangle);
-			
-			Triangle right_triangle;
-
-			Coordenadas coordenadas4 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas4);
-			Coordenadas coordenadas5 = {x + lado_length, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas5);
-			Coordenadas coordenadas6 = {x, y + lado_length, z};
-			right_triangle.pontos.push_back(coordenadas6);
-			side4.push_back(right_triangle);	
-
-			x += lado_length;
-			count += 1;
-		}
-		y += lado_length;
-	}
-
-	box_parts.push_back(bottom);
-	box_parts.push_back(top);
-	box_parts.push_back(side1);
-	box_parts.push_back(side2);
-	box_parts.push_back(side3);
-	box_parts.push_back(side4);
-
-	std::ofstream file("../build/3DFiles/" + filename);
-
-    if (file.is_open()) {
-        file << "box" << "\n\n";
-
-		for(vector<Triangle> triangles : box_parts){
-			for(Triangle triangle : triangles){
-				for(int i = 0; i < triangle.pontos.size(); ++i){
-					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
-					    if (i < triangle.pontos.size() - 1) { 
-        				    file << " ; ";
-        				} else {
-        				    file << " "; 
-        				}
-				}
-				file << "\n";
-			}
-			file << "\n";
-		}
-
-        file.close();
-        std::cout << "Texto escrito com sucesso no ficheiro!.\n";
-    } else {
-        std::cerr << "Erro ao abrir o ficheiro!.\n";
-    }
-}
-
-/*
 void generate_box(int length, int divisions, const std::string& filename){
 
 	float lado_length = (float)length / divisions;
@@ -366,11 +113,11 @@ void generate_box(int length, int divisions, const std::string& filename){
 
 			Square square;
 
-			Coordenadas coordenadas1 = {x, y, z};
+			Coordenadas coordenadas1 = {x + lado_length, y, z + lado_length};
 			square.pontos.push_back(coordenadas1);
 			Coordenadas coordenadas2 = {x, y, z + lado_length};
 			square.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x + lado_length, y, z + lado_length};
+			Coordenadas coordenadas3 = {x, y, z};
 			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x + lado_length, y, z};
 			square.pontos.push_back(coordenadas4);
@@ -449,11 +196,11 @@ void generate_box(int length, int divisions, const std::string& filename){
 
 			Square square;
 
-			Coordenadas coordenadas1 = {x, y, z};
+			Coordenadas coordenadas1 = {x, y + lado_length, z + lado_length};
 			square.pontos.push_back(coordenadas1);
 			Coordenadas coordenadas2 = {x, y, z + lado_length};
 			square.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x, y + lado_length, z + lado_length};
+			Coordenadas coordenadas3 = {x, y, z};
 			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x, y + lado_length, z};
 			square.pontos.push_back(coordenadas4);
@@ -477,11 +224,11 @@ void generate_box(int length, int divisions, const std::string& filename){
 
 			Square square;
 
-			Coordenadas coordenadas1 = {x, y, z};
+			Coordenadas coordenadas1 = {x + lado_length, y + lado_length, z};
 			square.pontos.push_back(coordenadas1);
 			Coordenadas coordenadas2 = {x + lado_length, y, z};
 			square.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {x + lado_length, y + lado_length, z};
+			Coordenadas coordenadas3 = {x, y, z};
 			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x, y + lado_length, z};
 			square.pontos.push_back(coordenadas4);
@@ -531,7 +278,7 @@ void generate_box(int length, int divisions, const std::string& filename){
 	put_object(box_parts, "box", filename);
 
 }
-*/
+
 void generate_cone(float radius, float height, int slices,int stacks, const std::string& filename) {
 
 	int i;
@@ -586,9 +333,9 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 			triangle.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
 			triangle.pontos.push_back(coordenadas3);
-			Coordenadas coordenadas5 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j)};
-			triangle.pontos.push_back(coordenadas5);
-
+			Coordenadas coordenadas4 = {cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j)};
+			triangle.pontos.push_back(coordenadas4);
+			
 			body.push_back(triangle);	
 		}
 	}

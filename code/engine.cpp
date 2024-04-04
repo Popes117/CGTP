@@ -149,7 +149,7 @@ std::vector<Square> parsePlane(const std::string& filename) {
 
 	return triangles;
 }
-
+/*
 std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
     
     std::string first_line;
@@ -192,9 +192,8 @@ std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
 
     return triangles;
 }
+*/
 
-
-/*
 std::vector<std::vector<Square>> parseBox(const std::string& filename) {
     
     std::string first_line;
@@ -237,7 +236,7 @@ std::vector<std::vector<Square>> parseBox(const std::string& filename) {
 
     return squares;
 }
-*/
+
 
 std::vector<std::vector<Square>> parseCone(const std::string& filename) {
     
@@ -336,26 +335,7 @@ void draw_plane(const std::string& filename){
 
 }
 
-void draw_box(const std::string& filename){
 
-	std::vector<std::vector<Triangle>> box_triangles = parseBox(filename);
-	
-	glBegin(GL_TRIANGLES);
-    glColor3f(1.0f, 1.0f, 1.0f);
-	for(std::vector<Triangle> triangles : box_triangles){
-		for(Triangle triangle : triangles){
-
-			glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-    		glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-			glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
-
-		}
-	}
-	glEnd();
-
-}
-
-/*
 void draw_box(const std::string& filename){
 
 	std::vector<std::vector<Square>> box_squares = parseBox(filename);
@@ -368,6 +348,7 @@ void draw_box(const std::string& filename){
 			glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3); 
     		glVertex3f(square.pontos[1].p1,square.pontos[1].p2, square.pontos[1].p3); 
 			glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3);
+            
             glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3); 
     	    glVertex3f(square.pontos[3].p1,square.pontos[3].p2, square.pontos[3].p3); 
 		    glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3);  
@@ -377,7 +358,7 @@ void draw_box(const std::string& filename){
 	glEnd();
 
 }
-*/
+
 
 void draw_cone(const std::string& filename){
 

@@ -424,6 +424,8 @@ void box(int length, int divisions){
 	float lado_length = (float)length / divisions;
 	float z = -((float)length / 2.0f);
 	float y = -((float)length / 2.0f);
+	
+	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_TRIANGLES);
 
 	//Base de baixo
@@ -432,13 +434,13 @@ void box(int length, int divisions){
 		int count = 0;
 
 		while(count < divisions){
-			glVertex3f(x, y, z); 
-			glVertex3f(x, y, z + lado_length); 
 			glVertex3f(x + lado_length, y, z + lado_length); 
+			glVertex3f(x, y, z + lado_length);
+			glVertex3f(x, y, z);  
 
+			glVertex3f(x, y, z);
+			glVertex3f(x + lado_length, y, z);  
 			glVertex3f(x + lado_length, y, z + lado_length); 
-			glVertex3f(x + lado_length, y, z); 
-			glVertex3f(x, y, z); 
 
 			x += lado_length;
 			count += 1;
@@ -476,6 +478,7 @@ void box(int length, int divisions){
 		int count = 0;
 
 		while(count < divisions){
+
 			glVertex3f(x, y, z); 
 			glVertex3f(x, y, z + lado_length); 
 			glVertex3f(x, y + lado_length, z + lado_length); 
@@ -497,13 +500,14 @@ void box(int length, int divisions){
 		int count = 0;
 
 		while(count < divisions){
-			glVertex3f(x, y, z); 
-			glVertex3f(x, y, z + lado_length); 
-			glVertex3f(x, y + lado_length, z + lado_length); 
 
 			glVertex3f(x, y + lado_length, z + lado_length); 
-			glVertex3f(x, y + lado_length, z); 
+			glVertex3f(x, y, z + lado_length); 
 			glVertex3f(x, y, z); 
+
+			glVertex3f(x, y, z); 
+			glVertex3f(x, y + lado_length, z); 
+			glVertex3f(x, y + lado_length, z + lado_length); 
 
 			z += lado_length;
 			count += 1;
@@ -519,13 +523,14 @@ void box(int length, int divisions){
 		int count = 0;
 
 		while(count < divisions){
-			glVertex3f(x, y, z); 
-			glVertex3f(x + lado_length, y, z); 
-			glVertex3f(x + lado_length, y + lado_length, z); 
 
 			glVertex3f(x + lado_length, y + lado_length, z); 
-			glVertex3f(x, y + lado_length, z); 
+			glVertex3f(x + lado_length, y, z); 
 			glVertex3f(x, y, z); 
+
+			glVertex3f(x, y, z); 
+			glVertex3f(x, y + lado_length, z); 
+			glVertex3f(x + lado_length, y + lado_length, z); 
 
 			x += lado_length;
 			count += 1;
@@ -540,6 +545,7 @@ void box(int length, int divisions){
 		int count = 0;
 
 		while(count < divisions){
+
 			glVertex3f(x, y, z); 
 			glVertex3f(x + lado_length, y, z); 
 			glVertex3f(x + lado_length, y + lado_length, z); 
@@ -842,9 +848,9 @@ void renderScene(void) {
 	glEnd();
 
 	//cylinder0(1,2,10);
-	//plane(2,7);
-	//box(2,5);
-	cone(1, 2, 20, 20);
+	plane(2,3);
+	//box(2,3);
+	//cone(1, 2, 4, 4);
 	//sphere(1,20,20);
 
 	//generate_plane(1,3,"plane.3d");
@@ -937,7 +943,7 @@ int main(int argc, char **argv) {
 //  OpenGL settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	spherical2Cartesian();
 
