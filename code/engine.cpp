@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stack>
 #include "tinyxml2-master/tinyxml2.h"
 #include "Includes/common.hpp"
 
@@ -25,7 +26,6 @@ float camX, camY, camZ;
 
 std::string filePath;
 std::vector<std::string> filePaths;
-std::vector<Transform> vetor_de_transformaçoes;
 
 int widtH;
 int heighT;
@@ -56,14 +56,26 @@ int opcao;
 
 using namespace std;
 
-void new_Transform(string type, float angle, float x, float y, float z){
-    Transform transform;
-    transform.type = type;
-    transform.angle = angle;
-    transform.x = x;
-    transform.y = y;
-    transform.z = z;
-    vetor_de_transformaçoes.push_back(transform);
+// Stack de matrizes
+std::stack<Matrix> matrixStack;
+Group og_group = Group();
+
+// Função para armazenar a matriz atual na stack
+void pushMatrix() {
+    Matrix mat;
+    glGetFloatv(GL_MODELVIEW_MATRIX, mat.data);
+    matrixStack.push(mat);
+}
+
+// Função para restaurar a matriz anterior da stack
+void popMatrix() {
+    if (!matrixStack.empty()) {
+        Matrix mat = matrixStack.top();
+        glLoadMatrixf(mat.data);
+        matrixStack.pop();
+    } else {
+        std::cerr << "Error: Matrix stack is empty!" << std::endl;
+    }
 }
 
 void spherical2Cartesian() {
@@ -138,6 +150,51 @@ std::vector<Square> parsePlane(const std::string& filename) {
 	return triangles;
 }
 
+std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
+    
+    std::string first_line;
+    int length;
+    int divisions;
+    int count = -1;
+
+    std::vector<std::vector<Triangle>> triangles;
+    triangles.push_back(std::vector<Triangle>()); // Bottom
+    triangles.push_back(std::vector<Triangle>()); // Top
+    triangles.push_back(std::vector<Triangle>()); // Side1
+    triangles.push_back(std::vector<Triangle>()); // Side2
+    triangles.push_back(std::vector<Triangle>()); // Side3
+    triangles.push_back(std::vector<Triangle>()); // Side4
+
+    std::ifstream file(filename);
+    char separador;
+
+    std::string linha;
+    if (std::getline(file, linha)) {
+        std::istringstream iss(linha);
+        iss >> first_line;
+    }
+
+    while (std::getline(file, linha)) {
+        if (linha.empty()) {
+            count++;
+        } else {
+            std::istringstream iss(linha);
+            Coordenadas ponto;
+            Triangle triangle;
+
+            while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
+                triangle.pontos.push_back(ponto);
+                iss >> separador;
+            }
+            triangles[count].push_back(triangle);
+        }
+    }
+
+    return triangles;
+}
+
+
+/*
 std::vector<std::vector<Square>> parseBox(const std::string& filename) {
     
     std::string first_line;
@@ -180,6 +237,7 @@ std::vector<std::vector<Square>> parseBox(const std::string& filename) {
 
     return squares;
 }
+*/
 
 std::vector<std::vector<Square>> parseCone(const std::string& filename) {
     
@@ -280,6 +338,26 @@ void draw_plane(const std::string& filename){
 
 void draw_box(const std::string& filename){
 
+	std::vector<std::vector<Triangle>> box_triangles = parseBox(filename);
+	
+	glBegin(GL_TRIANGLES);
+    glColor3f(1.0f, 1.0f, 1.0f);
+	for(std::vector<Triangle> triangles : box_triangles){
+		for(Triangle triangle : triangles){
+
+			glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
+    		glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
+			glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
+
+		}
+	}
+	glEnd();
+
+}
+
+/*
+void draw_box(const std::string& filename){
+
 	std::vector<std::vector<Square>> box_squares = parseBox(filename);
 	
 	glBegin(GL_TRIANGLES);
@@ -299,6 +377,7 @@ void draw_box(const std::string& filename){
 	glEnd();
 
 }
+*/
 
 void draw_cone(const std::string& filename){
 
@@ -376,6 +455,31 @@ void handle_form(const std::string& filename){
     else if (first_line == "sphere") {
         draw_sphere(filename);
     }
+}
+
+void handle_groups(const Group& group) {
+    
+    pushMatrix();
+
+    for (const auto& transform : group.transforms) {
+        if (transform.type == "translate") {
+            glTranslatef(transform.x, transform.y, transform.z);
+        } else if (transform.type == "rotate") {
+            glRotatef(transform.angle, transform.x, transform.y, transform.z);
+        } else if (transform.type == "scale") {
+            glScalef(transform.x, transform.y, transform.z);
+        }
+    }
+
+    for (const auto& model_path : group.model_paths) {
+        handle_form(model_path);
+    }
+
+    for (const auto& sub_group : group.groups) {
+        handle_groups(sub_group);
+    }
+
+    popMatrix();
 }
 
 void printMuitosTriangles(const std::vector<std::vector<Triangle>>& triangles) {
@@ -500,10 +604,11 @@ void processTextureElement(tinyxml2::XMLElement* textureElement) {
     }
 }
  
-void processModelElement(tinyxml2::XMLElement* modelElement) {
+void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     const char* file = modelElement->Attribute("file");
     filePath = "3DFiles/" + std::string(file);
     filePaths.push_back(filePath);
+    og_group.model_paths.push_back(filePath);
 
     /*
     if (strcmp(childName, "color") == 0) {
@@ -514,6 +619,7 @@ void processModelElement(tinyxml2::XMLElement* modelElement) {
         processTextureElement(child);
     }
     */
+
     if (file) {
         std::cout << "Model: File = " << file << std::endl;
     }
@@ -522,16 +628,15 @@ void processModelElement(tinyxml2::XMLElement* modelElement) {
     }
 }
  
-void processModelsElement(tinyxml2::XMLElement* modelsElement) {
+void processModelsElement(tinyxml2::XMLElement* modelsElement, Group& og_group) {
     for (tinyxml2::XMLElement* modelElement = modelsElement->FirstChildElement("model"); modelElement; modelElement = modelElement->NextSiblingElement("model")) {
-        processModelElement(modelElement);
+        processModelElement(modelElement, og_group);
     }
 }
 
-int processTransformElement(tinyxml2::XMLElement* transformElement) {
+void processTransformElement(tinyxml2::XMLElement* transformElement, Group& og_group) {
 
     float tx, ty, tz, rx, ry, rz, sx, sy, sz, angle;
-    int n_transforms = 0;
 
     for (tinyxml2::XMLElement* child = transformElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
@@ -540,59 +645,55 @@ int processTransformElement(tinyxml2::XMLElement* transformElement) {
             child->QueryFloatAttribute("x", &tx);
             child->QueryFloatAttribute("y", &ty);
             child->QueryFloatAttribute("z", &tz);
-            new_Transform("translate", 0, tx, ty, tz);
+            Transform transform = Transform("translate", 0, tx, ty, tz);
+            og_group.transforms.push_back(transform);
         }
         else if (strcmp(childName, "rotate") == 0) {
             child->QueryFloatAttribute("angle", &angle);
             child->QueryFloatAttribute("x", &rx);
             child->QueryFloatAttribute("y", &ry);
             child->QueryFloatAttribute("z", &rz);
-            new_Transform("rotate", angle, rx, ry, rz);
+            Transform transform = Transform("rotate", angle, rx, ry, rz);
+            og_group.transforms.push_back(transform);
         }
         else if (strcmp(childName, "scale") == 0) {
             child->QueryFloatAttribute("x", &sx);
             child->QueryFloatAttribute("y", &sy);
             child->QueryFloatAttribute("z", &sz);
-            new_Transform("scale", 0, sx, sy, sz);
+            Transform transform = Transform("scale", 0, sx, sy, sz);
+            og_group.transforms.push_back(transform);
         }
-        n_transforms++;
     }
 
-    return n_transforms;
     // guardar em variaveis globais
 }
 
 
  
-void processGroupElement(tinyxml2::XMLElement* groupElement) {
-    
-    int n_transforms = 0;
-    
+void processGroupElement(tinyxml2::XMLElement* groupElement, Group& og_group) {
+        
     for (tinyxml2::XMLElement* child = groupElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
  
         if (strcmp(childName, "models") == 0) {
-            processModelsElement(child);
+            processModelsElement(child, og_group);
         }
 
         if (strcmp(childName, "transform") == 0) {
             
-            int n = processTransformElement(child);
-            n_transforms += n;
+            processTransformElement(child, og_group);
         }
 
         if (strcmp(childName, "group") == 0) {
-            processGroupElement(child);
+
+            Group group_bla = Group();
+            
+            processGroupElement(child, group_bla);
+            og_group.groups.push_back(group_bla);
         }
-        //Adicione mais condições conforme necessário para outros tipos de elementos dentro de 'group'
+        //Adiciona mais condições conforme necessário para outros tipos de elementos dentro de 'group'
     }
 
-    int arr_len = vetor_de_transformaçoes.size();
-    while(n_transforms > 0){
-        //fazer o reverso da transformaçao[arr_len - n_transforms]
-        vetor_de_transformaçoes.pop_back();
-        n_transforms--;
-    }
 }
  
 void processLightElement(tinyxml2::XMLElement* lightElement) {
@@ -636,7 +737,8 @@ void processWorldElement(tinyxml2::XMLElement* worldElement) {
             processCameraElement(child);
         }
         else if (strcmp(childName, "group") == 0) {
-            processGroupElement(child);
+
+            processGroupElement(child, og_group);
         }
         else if (strcmp(childName, "light") == 0) {
             processLightElement(child);
@@ -689,9 +791,8 @@ void renderScene(){
 	glVertex3f(0.0f, 0.0f, 100.0f);
 	glEnd();
 	
-    for(std::string filePath : filePaths){
-        handle_form(filePath);
-    }
+    handle_groups(og_group);
+
 	// End of frame
 	glutSwapBuffers();
 }
