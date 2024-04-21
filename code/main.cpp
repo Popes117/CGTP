@@ -19,14 +19,14 @@
 #include <math.h>
 
 struct Coordenadas{
-	double p1, p2, p3;
+	double x, y, z;
 };
 
 struct Triangle{
 	std::vector<Coordenadas> pontos;
 };
 
-float alfa = 0.0f, betA = 0.0f, radius = 5.0f;
+float alfa = 0.0f, betA = 0.0f, radius = 10.0f;
 float camX, camY, camZ;
 using namespace std;
 
@@ -239,7 +239,7 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 		for(vector<Triangle> triangles : cone_parts){
 			for(Triangle triangle : triangles){
 				for(int i = 0; i < triangle.pontos.size(); ++i){
-					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
+					file << triangle.pontos[i].x << " " << triangle.pontos[i].y << " " << triangle.pontos[i].z;
 					    if (i < triangle.pontos.size() - 1) { 
         				    file << " ; ";
         				} else {
@@ -378,7 +378,7 @@ void generate_plane(int length, int divisions, const std::string& filename){
 			for(Triangle triangle : plane_triangles){
 				//for(Coordenadas ponto : triangle.pontos){
 				for(int i = 0; i < triangle.pontos.size(); ++i){
-					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
+					file << triangle.pontos[i].x << " " << triangle.pontos[i].y << " " << triangle.pontos[i].z;
 					    if (i < triangle.pontos.size() - 1) { 
         				    file << " ; ";
         				} else {
@@ -409,7 +409,7 @@ vector<Triangle> parsePlane(const std::string& filename) {
         Coordenadas ponto;
         Triangle triangle;
 
-        while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
+        while (iss >> ponto.x >> ponto.y >> ponto.z) {
             triangle.pontos.push_back(ponto);
 			iss >> separador;
         }
@@ -799,7 +799,7 @@ void generate_box(int length, int divisions, const std::string& filename){
 		for(vector<Triangle> triangles : box_parts){
 			for(Triangle triangle : triangles){
 				for(int i = 0; i < triangle.pontos.size(); ++i){
-					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
+					file << triangle.pontos[i].x << " " << triangle.pontos[i].y << " " << triangle.pontos[i].z;
 					    if (i < triangle.pontos.size() - 1) { 
         				    file << " ; ";
         				} else {
@@ -819,6 +819,100 @@ void generate_box(int length, int divisions, const std::string& filename){
         std::cerr << "Erro ao abrir o arquivo.\n";
     }
 }
+
+std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
+    std::string first_line;
+
+    int count = -1;
+
+    std::vector<vector<Coordenadas>> coordenadas;
+    coordenadas.push_back(std::vector<Coordenadas>()); // Bottom
+    coordenadas.push_back(std::vector<Coordenadas>()); // Stack
+    coordenadas.push_back(std::vector<Coordenadas>()); // Body
+
+    std::ifstream file(filename);
+    char separador;
+
+    std::string linha;
+    if (std::getline(file, linha)) {
+        std::istringstream iss(linha);
+        iss >> first_line;
+    }
+
+    while (std::getline(file, linha)) {
+        if (linha.empty()) {
+            count++;
+        } else {
+            std::istringstream iss(linha);
+            Coordenadas ponto;
+
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                coordenadas[count].push_back(ponto);
+                iss >> separador;
+            }
+        }
+    }
+
+    return coordenadas;
+
+}
+
+/*
+void draw_patches(const std::string& filename) {
+    std::vector<vector<Coordenadas>> patches = parsePatches(filename);
+
+	std::vector<Coordenadas> patch = patches[0];
+    glBegin(GL_POINTS);
+    for (const auto& ponto : patch) {
+        glVertex3f(ponto.x, ponto.y, ponto.z);
+    }
+    glEnd();
+}
+
+
+
+void draw_patches(const std::string& filename) {
+    std::vector<vector<Coordenadas>> patches = parsePatches(filename);
+
+	std::vector<Coordenadas> patch = patches[0];
+
+    glBegin(GL_TRIANGLES);
+    // Iterar sobre os pontos em grupos de três para desenhar triângulos
+    for (size_t i = 0; i + 2 < patch.size(); i += 3) {
+        const Coordenadas& ponto1 = patch[i];
+        const Coordenadas& ponto2 = patch[i + 1];
+        const Coordenadas& ponto3 = patch[i + 2];
+        glVertex3f(ponto1.x, ponto1.y, ponto1.z);
+        glVertex3f(ponto2.x, ponto2.y, ponto2.z);
+        glVertex3f(ponto3.x, ponto3.y, ponto3.z);
+    }
+    glEnd();
+
+}
+*/
+
+void draw_patches(const std::string& filename) {
+    std::vector<std::vector<Coordenadas>> patches = parsePatches(filename);
+
+    const auto& patch = patches[0]; // Acessa o primeiro patch
+    
+	glBegin(GL_TRIANGLE_STRIP); 
+    
+	for (size_t i = 0; i + 2 < patch.size(); ++i) {
+        const Coordenadas& ponto = patch[i]; 
+        glVertex3f(ponto.x, ponto.y, ponto.z);
+        // Verifica se há pontos suficientes para formar um triângulo completo
+        if (i + 3 < patch.size()) {
+            const Coordenadas& ponto2 = patch[i + 1]; 
+            const Coordenadas& ponto3 = patch[i + 2]; 
+            glVertex3f(ponto2.x, ponto2.y, ponto2.z);
+            glVertex3f(ponto3.x, ponto3.y, ponto3.z);
+        }
+    }
+    glEnd(); 
+    
+}
+
 
 void renderScene(void) {
 
@@ -848,7 +942,8 @@ void renderScene(void) {
 	glEnd();
 
 	//cylinder0(1,2,10);
-	plane(2,3);
+	//plane(2,3);
+	draw_patches("build/3DFiles/bezier_10.3d");
 	//box(2,3);
 	//cone(1, 2, 4, 4);
 	//sphere(1,20,20);
@@ -925,7 +1020,9 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(800,800);
 	glutCreateWindow("CG@DI-UM");
-		
+	
+	glutFullScreen();
+
 // Required callback registry 
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);

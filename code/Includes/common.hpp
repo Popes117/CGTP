@@ -1,7 +1,35 @@
 #include <vector>
+#include <cmath>
 
 struct Coordenadas{
-	double p1, p2, p3;
+	double x, y, z;
+
+    Coordenadas(float x, float y, float z) : x(x), y(y), z(z) {
+    }
+    Coordenadas(){
+
+    }
+    void addCoords(Coordenadas w){
+        x += w.x;
+        y += w.y;
+        z += w.z;
+    }
+    void multByFloat(float w){
+        x *= w;
+        y *= w;
+        z *= w;
+    }
+    void normalize(){
+        float vLen = sqrtf(x*x+y*y+z*z);
+        x = x / vLen;
+        y = y / vLen;
+        z = z / vLen;
+    };
+    Coordenadas get_cross_product(Coordenadas& v){
+        this->normalize();
+        v.normalize();
+        return Coordenadas((this->y*v.z) - (this->z*v.y), (this->z*v.x) - (this->x*v.z), (this->x*v.y) - (this->y*v.x));
+    };	
 };
 
 struct Triangle{

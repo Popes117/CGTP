@@ -71,6 +71,7 @@
         "variant": "cpp",
         "codecvt": "cpp",
         "source_location": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "shared_mutex": "cpp"
     }
 }

@@ -140,7 +140,7 @@ std::vector<Square> parsePlane(const std::string& filename) {
         Coordenadas ponto;
         Square square;
 
-        while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
+        while (iss >> ponto.x >> ponto.y >> ponto.z) {
             square.pontos.push_back(ponto);
 			iss >> separador;
         }
@@ -226,7 +226,7 @@ std::vector<std::vector<Square>> parseBox(const std::string& filename) {
             Coordenadas ponto;
             Square square;
 
-            while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
                 square.pontos.push_back(ponto);
                 iss >> separador;
             }
@@ -269,7 +269,7 @@ std::vector<std::vector<Square>> parseCone(const std::string& filename) {
             Coordenadas ponto;
             Square triangle;
 
-            while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
                 triangle.pontos.push_back(ponto);
                 iss >> separador;
             }
@@ -306,7 +306,7 @@ std::vector<Square> parseSphere(const std::string& filename) {
         Coordenadas ponto;
         Square triangle;
 
-        while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
+        while (iss >> ponto.x >> ponto.y >> ponto.z) {
             triangle.pontos.push_back(ponto);
 			iss >> separador;
         }
@@ -316,6 +316,45 @@ std::vector<Square> parseSphere(const std::string& filename) {
     return triangles;
 }
 
+
+std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
+    std::string first_line;
+
+    int count = -1;
+
+    std::vector<vector<Coordenadas>> coordenadas;
+    coordenadas.push_back(std::vector<Coordenadas>()); // Bottom
+    coordenadas.push_back(std::vector<Coordenadas>()); // Stack
+    coordenadas.push_back(std::vector<Coordenadas>()); // Body
+
+    std::ifstream file(filename);
+    char separador;
+
+    std::string linha;
+    if (std::getline(file, linha)) {
+        std::istringstream iss(linha);
+        iss >> first_line;
+    }
+
+    while (std::getline(file, linha)) {
+        if (linha.empty()) {
+            count++;
+        } else {
+            std::istringstream iss(linha);
+            Coordenadas ponto;
+
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                coordenadas[count].push_back(ponto);
+                iss >> separador;
+            }
+        }
+    }
+
+    return coordenadas;
+
+}
+
+
 void draw_plane(const std::string& filename){
 
     std::vector<Square> plane_triangles = parsePlane(filename);
@@ -324,12 +363,12 @@ void draw_plane(const std::string& filename){
     glColor3f(1.0f, 1.0f, 1.0f);
 	for(Square square : plane_triangles){
 
-		glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3); 
-    	glVertex3f(square.pontos[1].p1,square.pontos[1].p2, square.pontos[1].p3); 
-		glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3); 
-        glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3); 
-    	glVertex3f(square.pontos[3].p1,square.pontos[3].p2, square.pontos[3].p3); 
-		glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3); 
+		glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z); 
+    	glVertex3f(square.pontos[1].x,square.pontos[1].y, square.pontos[1].z); 
+		glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z); 
+        glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z); 
+    	glVertex3f(square.pontos[3].x,square.pontos[3].y, square.pontos[3].z); 
+		glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z); 
 	}
 	glEnd();
 
@@ -345,13 +384,13 @@ void draw_box(const std::string& filename){
 	for(std::vector<Square> squares : box_squares){
 		for(Square square : squares){
 
-			glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3); 
-    		glVertex3f(square.pontos[1].p1,square.pontos[1].p2, square.pontos[1].p3); 
-			glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3);
+			glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z); 
+    		glVertex3f(square.pontos[1].x,square.pontos[1].y, square.pontos[1].z); 
+			glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z);
             
-            glVertex3f(square.pontos[2].p1,square.pontos[2].p2, square.pontos[2].p3); 
-    	    glVertex3f(square.pontos[3].p1,square.pontos[3].p2, square.pontos[3].p3); 
-		    glVertex3f(square.pontos[0].p1,square.pontos[0].p2, square.pontos[0].p3);  
+            glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z); 
+    	    glVertex3f(square.pontos[3].x,square.pontos[3].y, square.pontos[3].z); 
+		    glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z);  
 
 		}
 	}
@@ -369,17 +408,17 @@ void draw_cone(const std::string& filename){
 	for(std::vector<Square> triangles : cone_triangles){
 		for(Square triangle : triangles){
             if(triangle.pontos.size() == 3){
-                glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-    		    glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-			    glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3);
+                glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
+    		    glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
+			    glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z);
             }
             else{
-                glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-    		    glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-			    glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3);
-                glVertex3f(triangle.pontos[3].p1,triangle.pontos[3].p2, triangle.pontos[3].p3); 
-    		    glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-			    glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3);
+                glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
+    		    glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
+			    glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z);
+                glVertex3f(triangle.pontos[3].x,triangle.pontos[3].y, triangle.pontos[3].z); 
+    		    glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
+			    glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z);
             }
 
 		}
@@ -397,15 +436,27 @@ void draw_sphere(const std::string& filename) {
     glColor3f(1.0f, 1.0f, 1.0f);
 	for(Square triangle : sphere_triangles){
 
-		glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
-    	glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-		glVertex3f(triangle.pontos[2].p1,triangle.pontos[2].p2, triangle.pontos[2].p3); 
-        glVertex3f(triangle.pontos[3].p1,triangle.pontos[3].p2, triangle.pontos[3].p3); 
-    	glVertex3f(triangle.pontos[1].p1,triangle.pontos[1].p2, triangle.pontos[1].p3); 
-		glVertex3f(triangle.pontos[0].p1,triangle.pontos[0].p2, triangle.pontos[0].p3); 
+		glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
+    	glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
+		glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z); 
+        glVertex3f(triangle.pontos[3].x,triangle.pontos[3].y, triangle.pontos[3].z); 
+    	glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
+		glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
 	}
 	glEnd();
 
+}
+
+void draw_patches(const std::string& filename) {
+    std::vector<vector<Coordenadas>> patches = parsePatches(filename);
+
+    for (const auto& patch : patches) {
+        glBegin(GL_LINE_STRIP);
+        for (const auto& ponto : patch) {
+            glVertex3f(ponto.x, ponto.y, ponto.z);
+        }
+        glEnd();
+    }
 }
 
 void handle_form(const std::string& filename){
@@ -468,7 +519,7 @@ void printMuitosTriangles(const std::vector<std::vector<Triangle>>& triangles) {
         for (const auto& triangle : triangleList) {
             std::cout << "Triangle:\n";
             for (const auto& ponto : triangle.pontos) {
-                std::cout << "  (" << ponto.p1 << ", " << ponto.p2 << ", " << ponto.p3 << ")\n";
+                std::cout << "  (" << ponto.x << ", " << ponto.y << ", " << ponto.z << ")\n";
             }
             std::cout << std::endl;
         }
@@ -479,7 +530,7 @@ void printPoucosTriangles(const std::vector<Triangle>& triangles) {
     for (const auto& triangle : triangles){
         std::cout << "Triangle:\n";
         for (const auto& ponto : triangle.pontos) {
-            std::cout << "  (" << ponto.p1 << ", " << ponto.p2 << ", " << ponto.p3 << ")\n";
+            std::cout << "  (" << ponto.x << ", " << ponto.y << ", " << ponto.z << ")\n";
         }
         std::cout << std::endl;
     }

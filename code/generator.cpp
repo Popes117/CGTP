@@ -25,6 +25,7 @@ float camX, camY, camZ;
 using namespace std;
 
 void put_object(vector<vector<Square>> parts, string shape,const std::string& filename){
+	//std::ofstream file("../build/3DFiles/" + filename);
 	std::ofstream file("../build/3DFiles/" + filename);
 
     if (file.is_open()) {
@@ -33,13 +34,35 @@ void put_object(vector<vector<Square>> parts, string shape,const std::string& fi
 		for(vector<Square> triangles : parts){
 			for(Square triangle : triangles){
 				for(int i = 0; i < triangle.pontos.size(); ++i){
-					file << triangle.pontos[i].p1 << " " << triangle.pontos[i].p2 << " " << triangle.pontos[i].p3;
+					file << triangle.pontos[i].x << " " << triangle.pontos[i].y << " " << triangle.pontos[i].z;
 					    if (i < triangle.pontos.size() - 1) { 
         				    file << " ; ";
         				} else {
         				    file << " "; 
         				}
 				}
+				file << "\n";
+			}
+			file << "\n";
+		}
+
+        file.close();
+        std::cout << "Texto escrito com sucesso no ficheiro!\n";
+    } else {
+        std::cerr << "Erro ao abrir o ficheiro!\n";
+    }
+
+}
+
+void put_patches(vector<vector<Coordenadas>> patches, string shape,const std::string& filename){
+	std::ofstream file("../build/3DFiles/" + filename);
+
+    if (file.is_open()) {
+        file << shape << "\n\n";
+
+		for(vector<Coordenadas> triangles : patches){
+			for(Coordenadas coordenadas : triangles){
+				file << coordenadas.x << " " << coordenadas.y << " " << coordenadas.z << " ; ";
 				file << "\n";
 			}
 			file << "\n";
@@ -384,6 +407,233 @@ void generate_sphere(double radius, int slices, int stacks, const std::string& f
 	put_object(squared, "sphere", filename);
 }
 
+std::string readLineinFile(std::string const &fileInput, int lineNumber){
+    std::string resultado;
+    std::ifstream MyReadFile(fileInput);
+    int lineNumberLido = 1;
+
+    while (getline(MyReadFile, resultado))
+    {
+        if (lineNumber == lineNumberLido)
+        {
+            break;
+        }
+        else
+        {
+            lineNumberLido++;
+        }
+    }
+
+    return resultado;
+}
+
+std::vector<std::string> split(const std::string &s, char delim)
+{
+    std::vector<std::string> result;
+    std::stringstream ss(s);
+    std::string item;
+
+    while (getline(ss, item, delim))
+    {
+        result.push_back(item);
+    }
+
+    return result;
+}
+
+//Recebe apenas 1 linha da matriz de Bezier
+Coordenadas multMatrixVector(float c[4], Coordenadas matrixPontos[4])
+{
+    Coordenadas pontosInt[4], res;
+    for (int i = 0; i < 4; i++)
+    {
+        res = matrixPontos[i];
+        res.multByFloat(c[i]);
+        pontosInt[i] = res;
+    }
+    Coordenadas final = Coordenadas(0.0, 0.0, 0.0);
+    for (int k = 0; k < 4; final.addCoords(pontosInt[k++]));
+    return final;
+}
+
+void generate_patches(const std::string& fileInput, int tesselation, const std::string& fileOutput){
+
+    int nPontos = 0;
+    int lineNumber;
+    int it = 0;
+    int column = 0;
+    int line = 0;
+	std::string newFileInput = "patches/" + fileInput;
+    int nPatches = std::stoi(readLineinFile(newFileInput, 1));
+    int nControlPoints = std::stoi(readLineinFile(newFileInput, nPatches + 2));
+    std::vector<Coordenadas> texturas;
+    std::vector<Coordenadas> normais;
+    std::vector<Coordenadas> coordenadas;
+	std::vector<vector<Coordenadas>> patches;
+
+    Coordenadas arrayVertices[nControlPoints];
+    int arrayPatches[nPatches * 4][4];
+
+	// Parse do ficheiro de patches
+
+    std::string myText;
+    std::ifstream MyReadFile(newFileInput);
+
+    while (getline(MyReadFile, myText))
+    {
+        if (it == 0)
+        {
+            lineNumber = std::stoi(myText);
+            it++;
+        }
+        else if (it >= 1 && it <= lineNumber)
+        {
+            std::vector<std::string> res = split(myText, ',');
+            for (auto i : res)
+            {
+                if (column < 4)
+                {
+                    arrayPatches[line][column] = std::stoi(i);
+                    column++;
+                }
+                else
+                {
+                    line++;
+                    column = 0;
+                    arrayPatches[line][column] = std::stoi(i);
+                    column++;
+                }
+            }
+            it++;
+        }
+        else if (it > lineNumber + 1)
+        {
+            std::vector<std::string> res = split(myText, ',');
+			Coordenadas coordenadas = {std::stof(res[0]), std::stof(res[1]), std::stof(res[2])};
+            arrayVertices[nPontos] = coordenadas;
+            nPontos++;
+            it++;
+        }
+        else
+        {
+            it++;
+        }
+    }
+    MyReadFile.close();
+
+	// Tratamento da informação do parse
+
+    Coordenadas pontosFinais[tesselation+1][tesselation+1], normaisFinais[tesselation+1][tesselation+1];
+    float bezierMatrix[4][4] = {{-1, 3, -3, 1},
+                              	{3, -6, 3, 0},
+                              	{-3, 3, 0, 0},
+                              	{1, 0, 0, 0}};
+    int linhasPatch = 0;
+
+    while (linhasPatch != nPatches * 4){
+        
+		Coordenadas pontosPatch[4][4] = {{arrayVertices[arrayPatches[linhasPatch][0]], arrayVertices[arrayPatches[linhasPatch + 1][0]], arrayVertices[arrayPatches[linhasPatch + 2][0]], arrayVertices[arrayPatches[linhasPatch + 3][0]]},
+                      					 {arrayVertices[arrayPatches[linhasPatch][1]], arrayVertices[arrayPatches[linhasPatch + 1][1]], arrayVertices[arrayPatches[linhasPatch + 2][1]], arrayVertices[arrayPatches[linhasPatch + 3][1]]},
+                      					 {arrayVertices[arrayPatches[linhasPatch][2]], arrayVertices[arrayPatches[linhasPatch + 1][2]], arrayVertices[arrayPatches[linhasPatch + 2][2]], arrayVertices[arrayPatches[linhasPatch + 3][2]]},
+                      					 {arrayVertices[arrayPatches[linhasPatch][3]], arrayVertices[arrayPatches[linhasPatch + 1][3]], arrayVertices[arrayPatches[linhasPatch + 2][3]], arrayVertices[arrayPatches[linhasPatch + 3][3]]}};
+        Coordenadas matrix_MP[4][4];
+	    
+		for (auto i = 0; i < 4; i++)
+        {
+            for (auto j = 0; j < 4; j++)
+            {
+                matrix_MP[i][j] = multMatrixVector(bezierMatrix[i], pontosPatch[j]);
+            }
+        }
+
+        Coordenadas matrix_MPM[4][4];
+        for (auto i = 0; i < 4; i++)
+        {
+            for (auto j = 0; j < 4; j++)
+            {
+                matrix_MPM[i][j] = multMatrixVector(bezierMatrix[j], matrix_MP[i]);
+            }
+        }
+        Coordenadas matrix_MPM_trans[4][4];
+        for (auto i = 0; i < 4; i++)
+        {
+            for (auto j = 0; j < 4; j++)
+            {
+                matrix_MPM_trans[i][j] = matrix_MPM[j][i];
+            }
+        }
+
+        for (int u = 0; u <= tesselation; u++)
+        {
+            float uf = float(u) / tesselation;
+            float u_vetor[4] = {uf * uf * uf, uf * uf, uf, 1};
+            float u_vetor_deriv[4] = {uf * uf * 3, uf * 2, 1, 0};
+            for (int v = 0; v <= tesselation; v++)
+            {
+                float vf = float(v) / tesselation;
+                float v_vetor[4] = {vf * vf * vf, vf * vf, vf, 1};
+                float v_vetor_deriv[4] = {vf * vf * 3, vf * 2, 1, 0};
+
+                Coordenadas u_vetorXcalculada[4], puv;
+                Coordenadas u_vetorXcalculada_uderiv[4], puv_uderiv, puv_vderiv;
+                for (auto i = 0; i < 4; i++)
+                {
+                    u_vetorXcalculada[i] = multMatrixVector(u_vetor, matrix_MPM_trans[i]);
+                    u_vetorXcalculada_uderiv[i] = multMatrixVector(u_vetor_deriv, matrix_MPM_trans[i]);
+                }
+                puv = multMatrixVector(v_vetor, u_vetorXcalculada);
+                pontosFinais[u][v] = puv;
+                puv_uderiv = multMatrixVector(v_vetor, u_vetorXcalculada_uderiv);
+                puv_vderiv = multMatrixVector(v_vetor_deriv, u_vetorXcalculada);
+                Coordenadas normal = puv_vderiv.get_cross_product(puv_uderiv);
+                normal.normalize();
+                normaisFinais[u][v] = normal;
+            }
+        }
+        
+        for (int i = 0; i <= tesselation; i++)
+            for (int k = 0; k <= tesselation; k++){
+                texturas.push_back(Coordenadas(1-(k/(float)tesselation), (i/(float)tesselation), 0));
+                normais.push_back(normaisFinais[i][k]);
+                coordenadas.push_back(pontosFinais[i][k]);
+            } 
+        linhasPatch += 4;
+    }
+
+	patches.push_back(coordenadas);
+	patches.push_back(normais);
+	patches.push_back(texturas);
+
+/*
+    for (int k = 0; k < nPatches; k++)
+    {
+        for (int l = 0; l < tesselation; l++)
+        {
+            for(int c = 1 ;c < tesselation +1 ;c++){
+                Coordenadas indexes = Coordenadas(((c+l*(tesselation+1)) + 1) + k * (tesselation+1)*(tesselation+1),
+                                    (c+l*(tesselation+1)) + (tesselation+1) + (k * (tesselation+1)*(tesselation+1)),
+                                    ((c+l*(tesselation+1))) + (k * (tesselation+1)*(tesselation+1)));
+                m.pushFace(face(
+                    vertex_ref(indexes.x, indexes.x, indexes.x),
+                    vertex_ref(indexes.y, indexes.y, indexes.y),
+                    vertex_ref(indexes.z, indexes.z, indexes.z)
+                ));
+                indexes = Coordenadas(((c+l*(tesselation+1)) + 1) + k * (tesselation+1)*(tesselation+1),
+                               ((c+l*(tesselation+1)) + (tesselation+2)) + k * (tesselation+1)*(tesselation+1),
+                               ((c+l*(tesselation+1)) + (tesselation+1)) + k * (tesselation+1)*(tesselation+1));
+                m.pushFace(face(
+                    vertex_ref(indexes.x, indexes.x, indexes.x),
+                    vertex_ref(indexes.y, indexes.y, indexes.y),
+                    vertex_ref(indexes.z, indexes.z, indexes.z)
+                ));
+            }
+        }
+    }
+    */
+
+   put_patches(patches, "patch", fileOutput);
+}
+
 int main(int argc, char** argv){
 
     if (argc < 2) {
@@ -403,7 +653,11 @@ int main(int argc, char** argv){
 	else if (strcmp(argv[1], "sphere") == 0) {
 		generate_sphere(std::stof(argv[2]), std::stof(argv[3]), std::stoi(argv[4]),argv[5]);
 	}
+	else if (strcmp(argv[1], "patch") == 0) {
+		generate_patches(argv[2], std::stoi(argv[3]),argv[4]);
+	}
 	else{
+		std::cout << "Main" << "\n";
         std::cout << "Erro ao abrir o ficheiro!\n";
 		return 0;
 	}

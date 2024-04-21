@@ -255,6 +255,9 @@ OPENGL_GLES2_INCLUDE_DIR:PATH=/usr/include
 OPENGL_GLES3_INCLUDE_DIR:PATH=/usr/include
 
 //Path to a file.
+OPENGL_GLU_INCLUDE_DIR:PATH=/usr/include
+
+//Path to a file.
 OPENGL_GLX_INCLUDE_DIR:PATH=/usr/include
 
 //Path to a file.
@@ -313,9 +316,9 @@ CMAKE_CACHEFILE_DIR:INTERNAL=/home/popes/Desktop/3ºAno 2ºSemestre/cg24/build
 //Major version of cmake used to create the current loaded cache
 CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 //Minor version of cmake used to create the current loaded cache
-CMAKE_CACHE_MINOR_VERSION:INTERNAL=28
+CMAKE_CACHE_MINOR_VERSION:INTERNAL=29
 //Patch version of cmake used to create the current loaded cache
-CMAKE_CACHE_PATCH_VERSION:INTERNAL=3
+CMAKE_CACHE_PATCH_VERSION:INTERNAL=1
 //ADVANCED property for variable: CMAKE_COLOR_MAKEFILE
 CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 //Path to CMake executable.
@@ -481,6 +484,8 @@ OPENGL_EGL_INCLUDE_DIR-ADVANCED:INTERNAL=1
 OPENGL_GLES2_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_GLES3_INCLUDE_DIR
 OPENGL_GLES3_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OPENGL_GLU_INCLUDE_DIR
+OPENGL_GLU_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_GLX_INCLUDE_DIR
 OPENGL_GLX_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_INCLUDE_DIR
