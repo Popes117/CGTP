@@ -55,7 +55,7 @@ void put_object(vector<vector<Square>> parts, string shape,const std::string& fi
 }
 
 void put_patches(vector<vector<Coordenadas>> patches, string shape,const std::string& filename){
-	std::ofstream file("../build/3DFiles/" + filename);
+	std::ofstream file("build/3DFiles/" + filename);
 
     if (file.is_open()) {
         file << shape << "\n\n";
@@ -469,6 +469,7 @@ void generate_patches(const std::string& fileInput, int tesselation, const std::
     std::vector<Coordenadas> texturas;
     std::vector<Coordenadas> normais;
     std::vector<Coordenadas> coordenadas;
+	std::vector<Coordenadas> indexes_vetor;
 	std::vector<vector<Coordenadas>> patches;
 
     Coordenadas arrayVertices[nControlPoints];
@@ -537,7 +538,7 @@ void generate_patches(const std::string& fileInput, int tesselation, const std::
                       					 {arrayVertices[arrayPatches[linhasPatch][2]], arrayVertices[arrayPatches[linhasPatch + 1][2]], arrayVertices[arrayPatches[linhasPatch + 2][2]], arrayVertices[arrayPatches[linhasPatch + 3][2]]},
                       					 {arrayVertices[arrayPatches[linhasPatch][3]], arrayVertices[arrayPatches[linhasPatch + 1][3]], arrayVertices[arrayPatches[linhasPatch + 2][3]], arrayVertices[arrayPatches[linhasPatch + 3][3]]}};
         Coordenadas matrix_MP[4][4];
-	    
+
 		for (auto i = 0; i < 4; i++)
         {
             for (auto j = 0; j < 4; j++)
@@ -597,39 +598,30 @@ void generate_patches(const std::string& fileInput, int tesselation, const std::
                 normais.push_back(normaisFinais[i][k]);
                 coordenadas.push_back(pontosFinais[i][k]);
             } 
-        linhasPatch += 4;
-    }
+        	linhasPatch += 4;
+    	}
 
-	patches.push_back(coordenadas);
-	patches.push_back(normais);
-	patches.push_back(texturas);
-
-/*
     for (int k = 0; k < nPatches; k++)
     {
         for (int l = 0; l < tesselation; l++)
         {
-            for(int c = 1 ;c < tesselation +1 ;c++){
+            for(int c = 0 ;c < tesselation ;c++){
                 Coordenadas indexes = Coordenadas(((c+l*(tesselation+1)) + 1) + k * (tesselation+1)*(tesselation+1),
                                     (c+l*(tesselation+1)) + (tesselation+1) + (k * (tesselation+1)*(tesselation+1)),
                                     ((c+l*(tesselation+1))) + (k * (tesselation+1)*(tesselation+1)));
-                m.pushFace(face(
-                    vertex_ref(indexes.x, indexes.x, indexes.x),
-                    vertex_ref(indexes.y, indexes.y, indexes.y),
-                    vertex_ref(indexes.z, indexes.z, indexes.z)
-                ));
+				indexes_vetor.push_back(indexes);
                 indexes = Coordenadas(((c+l*(tesselation+1)) + 1) + k * (tesselation+1)*(tesselation+1),
                                ((c+l*(tesselation+1)) + (tesselation+2)) + k * (tesselation+1)*(tesselation+1),
                                ((c+l*(tesselation+1)) + (tesselation+1)) + k * (tesselation+1)*(tesselation+1));
-                m.pushFace(face(
-                    vertex_ref(indexes.x, indexes.x, indexes.x),
-                    vertex_ref(indexes.y, indexes.y, indexes.y),
-                    vertex_ref(indexes.z, indexes.z, indexes.z)
-                ));
+				indexes_vetor.push_back(indexes);
             }
         }
     }
-    */
+
+	patches.push_back(coordenadas);
+	patches.push_back(indexes_vetor);
+	patches.push_back(normais);
+	patches.push_back(texturas);
 
    put_patches(patches, "patch", fileOutput);
 }

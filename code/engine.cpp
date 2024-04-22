@@ -326,6 +326,7 @@ std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
     coordenadas.push_back(std::vector<Coordenadas>()); // Bottom
     coordenadas.push_back(std::vector<Coordenadas>()); // Stack
     coordenadas.push_back(std::vector<Coordenadas>()); // Body
+    coordenadas.push_back(std::vector<Coordenadas>());
 
     std::ifstream file(filename);
     char separador;
@@ -448,15 +449,29 @@ void draw_sphere(const std::string& filename) {
 }
 
 void draw_patches(const std::string& filename) {
-    std::vector<vector<Coordenadas>> patches = parsePatches(filename);
+    std::vector<std::vector<Coordenadas>> patches = parsePatches(filename);
 
-    for (const auto& patch : patches) {
-        glBegin(GL_LINE_STRIP);
-        for (const auto& ponto : patch) {
-            glVertex3f(ponto.x, ponto.y, ponto.z);
-        }
-        glEnd();
+    const auto& patch = patches[0]; // Acessa o primeiro patch
+    std::cout << "Nigger" << "\n";
+
+    const auto& indexes = patches[1]; // Acessa os índices dos patches
+	glBegin(GL_TRIANGLES); 
+    glColor3f(1.0f, 1.0f, 1.0f);
+    std::cout << "Comecei a desenhar" << "\n";
+	for (size_t i = 0; i < indexes.size(); i++) {
+        const Coordenadas& ponto1 = patch[indexes[i].x]; 
+        const Coordenadas& ponto2 = patch[indexes[i].y]; 
+        const Coordenadas& ponto3 = patch[indexes[i].z]; 
+
+        // Primeiro triângulo
+        glVertex3f(ponto1.x, ponto1.y, ponto1.z);
+        glVertex3f(ponto2.x, ponto2.y, ponto2.z);
+        glVertex3f(ponto3.x, ponto3.y, ponto3.z);
+
     }
+    std::cout << "Acabei de desenhar" << "\n";
+    glEnd(); 
+    
 }
 
 void handle_form(const std::string& filename){
@@ -486,6 +501,10 @@ void handle_form(const std::string& filename){
     }
     else if (first_line == "sphere") {
         draw_sphere(filename);
+    }
+    else if (first_line == "patch") {
+        std::cout << "Vou desenhar um patch" << "\n";
+        draw_patches(filename);
     }
 }
 
@@ -638,7 +657,7 @@ void processTextureElement(tinyxml2::XMLElement* textureElement) {
  
 void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     const char* file = modelElement->Attribute("file");
-    filePath = "3DFiles/" + std::string(file);
+    filePath = "build/3DFiles/" + std::string(file);
     filePaths.push_back(filePath);
     og_group.model_paths.push_back(filePath);
 
@@ -823,6 +842,8 @@ void renderScene(){
 	glVertex3f(0.0f, 0.0f, 100.0f);
 	glEnd();
 	
+    std::cout << "renderScene" << std::endl;
+
     handle_groups(og_group);
 
 	// End of frame

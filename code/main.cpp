@@ -829,6 +829,7 @@ std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
     coordenadas.push_back(std::vector<Coordenadas>()); // Bottom
     coordenadas.push_back(std::vector<Coordenadas>()); // Stack
     coordenadas.push_back(std::vector<Coordenadas>()); // Body
+    coordenadas.push_back(std::vector<Coordenadas>());
 
     std::ifstream file(filename);
     char separador;
@@ -858,17 +859,18 @@ std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
 }
 
 /*
+
 void draw_patches(const std::string& filename) {
     std::vector<vector<Coordenadas>> patches = parsePatches(filename);
 
 	std::vector<Coordenadas> patch = patches[0];
     glBegin(GL_POINTS);
+	glColor3f(1.0f, 1.0f, 1.0f);
     for (const auto& ponto : patch) {
         glVertex3f(ponto.x, ponto.y, ponto.z);
     }
     glEnd();
 }
-
 
 
 void draw_patches(const std::string& filename) {
@@ -889,30 +891,58 @@ void draw_patches(const std::string& filename) {
     glEnd();
 
 }
-*/
 
 void draw_patches(const std::string& filename) {
     std::vector<std::vector<Coordenadas>> patches = parsePatches(filename);
 
     const auto& patch = patches[0]; // Acessa o primeiro patch
     
-	glBegin(GL_TRIANGLE_STRIP); 
+	glBegin(GL_TRIANGLES); 
     
-	for (size_t i = 0; i + 2 < patch.size(); ++i) {
-        const Coordenadas& ponto = patch[i]; 
-        glVertex3f(ponto.x, ponto.y, ponto.z);
-        // Verifica se há pontos suficientes para formar um triângulo completo
-        if (i + 3 < patch.size()) {
-            const Coordenadas& ponto2 = patch[i + 1]; 
-            const Coordenadas& ponto3 = patch[i + 2]; 
-            glVertex3f(ponto2.x, ponto2.y, ponto2.z);
-            glVertex3f(ponto3.x, ponto3.y, ponto3.z);
-        }
+	for (size_t i = 0; i + 3 < patch.size(); i+=4) {
+        const Coordenadas& ponto1 = patch[i]; 
+        const Coordenadas& ponto2 = patch[i + 1]; 
+        const Coordenadas& ponto3 = patch[i + 2]; 
+        const Coordenadas& ponto4 = patch[i + 3]; 
+
+        // Primeiro triângulo
+        glVertex3f(ponto1.x, ponto1.y, ponto1.z);
+        glVertex3f(ponto2.x, ponto2.y, ponto2.z);
+        glVertex3f(ponto3.x, ponto3.y, ponto3.z);
+
+        // Segundo triângulo
+        glVertex3f(ponto4.x, ponto4.y, ponto4.z);
+        glVertex3f(ponto2.x, ponto2.y, ponto2.z);
+        glVertex3f(ponto1.x, ponto1.y, ponto1.z);
     }
     glEnd(); 
     
 }
 
+*/
+
+void draw_patches(const std::string& filename) {
+    std::vector<std::vector<Coordenadas>> patches = parsePatches(filename);
+
+    const auto& patch = patches[0]; // Acessa o primeiro patch
+    const auto& indexes = patches[1]; // Acessa os índices dos patches
+	glBegin(GL_TRIANGLES); 
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+	for (size_t i = 0; i < indexes.size(); i++) {
+        const Coordenadas& ponto1 = patch[indexes[i].x]; 
+        const Coordenadas& ponto2 = patch[indexes[i].y]; 
+        const Coordenadas& ponto3 = patch[indexes[i].z]; 
+
+        // Primeiro triângulo
+        glVertex3f(ponto1.x, ponto1.y, ponto1.z);
+        glVertex3f(ponto2.x, ponto2.y, ponto2.z);
+        glVertex3f(ponto3.x, ponto3.y, ponto3.z);
+    }
+
+    glEnd(); 
+    
+}
 
 void renderScene(void) {
 
@@ -1021,8 +1051,6 @@ int main(int argc, char **argv) {
 	glutInitWindowSize(800,800);
 	glutCreateWindow("CG@DI-UM");
 	
-	glutFullScreen();
-
 // Required callback registry 
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
