@@ -687,25 +687,55 @@ void processModelsElement(tinyxml2::XMLElement* modelsElement, Group& og_group) 
 
 void processTransformElement(tinyxml2::XMLElement* transformElement, Group& og_group) {
 
-    float tx, ty, tz, rx, ry, rz, sx, sy, sz, angle;
+    float tx, ty, tz, rx, ry, rz, sx, sy, sz, angle, time;
+    bool align;
 
     for (tinyxml2::XMLElement* child = transformElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
 
         if (strcmp(childName, "translate") == 0) {
-            child->QueryFloatAttribute("x", &tx);
-            child->QueryFloatAttribute("y", &ty);
-            child->QueryFloatAttribute("z", &tz);
-            Transform transform = Transform("translate", 0, tx, ty, tz);
-            og_group.transforms.push_back(transform);
+            if (child->QueryFloatAttribute("time", &time) == tinyxml2::XML_SUCCESS &&
+                child->QueryBoolAttribute("align", &align) == tinyxml2::XML_SUCCESS) {
+                // Complex translation with time and alignment
+                std::vector<Coordenadas> points;
+                for (tinyxml2::XMLElement* pointElement = child->FirstChildElement("point"); pointElement; pointElement = pointElement->NextSiblingElement("point")) {
+                    float px, py, pz;
+                    pointElement->QueryFloatAttribute("x", &px);
+                    pointElement->QueryFloatAttribute("y", &py);
+                    pointElement->QueryFloatAttribute("z", &pz);
+                    points.push_back(Coordenadas(px, py, pz));
+                }
+                Transform transform = Transform("translate", time, align, points);
+                og_group.transforms.push_back(transform);
+            }
+            else {
+                // Simple translation
+                child->QueryFloatAttribute("x", &tx);
+                child->QueryFloatAttribute("y", &ty);
+                child->QueryFloatAttribute("z", &tz);
+                Transform transform = Transform("translate", 0, tx, ty, tz);
+                og_group.transforms.push_back(transform);
+            }
         }
         else if (strcmp(childName, "rotate") == 0) {
-            child->QueryFloatAttribute("angle", &angle);
-            child->QueryFloatAttribute("x", &rx);
-            child->QueryFloatAttribute("y", &ry);
-            child->QueryFloatAttribute("z", &rz);
-            Transform transform = Transform("rotate", angle, rx, ry, rz);
-            og_group.transforms.push_back(transform);
+
+            if (child->QueryFloatAttribute("time", &time) == tinyxml2::XML_SUCCESS) {
+                child->QueryFloatAttribute("time", &time);
+                child->QueryFloatAttribute("x", &rx);
+                child->QueryFloatAttribute("y", &ry);
+                child->QueryFloatAttribute("z", &rz);
+                Transform transform = Transform("rotateT", angle, rx, ry, rz);
+                og_group.transforms.push_back(transform);
+            }
+            else {
+                child->QueryFloatAttribute("angle", &angle);
+                child->QueryFloatAttribute("x", &rx);
+                child->QueryFloatAttribute("y", &ry);
+                child->QueryFloatAttribute("z", &rz);
+                Transform transform = Transform("rotateA", angle, rx, ry, rz);
+                og_group.transforms.push_back(transform);
+            }
+
         }
         else if (strcmp(childName, "scale") == 0) {
             child->QueryFloatAttribute("x", &sx);
@@ -715,6 +745,8 @@ void processTransformElement(tinyxml2::XMLElement* transformElement, Group& og_g
             og_group.transforms.push_back(transform);
         }
     }
+
+}
 
     // guardar em variaveis globais
 }
