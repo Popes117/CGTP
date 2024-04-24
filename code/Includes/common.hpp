@@ -44,11 +44,16 @@ struct Matrix {
     GLfloat data[16];
 };
 
-struct Transform{
-	std::string type;
-	float angle, x, y, z;
+struct Transform {
+    std::string type;
+    float angle, x, y, z, time;
+    bool align;
+    std::vector<Coordenadas> pontos;
 
-	Transform(std::string type, float angle, float x, float y, float z):type(type), angle(angle), x(x), y(y), z(z){}
+    Transform(std::string type, float angle, float x, float y, float z) :type(type), angle(angle), x(x), y(y), z(z) {}
+    Transform(std::string type, float time, bool align, std::vector<Coordenadas> pontos) :type(type), time(time), align(align), pontos(pontos) {}
+
+
 };
 
 class Group{
