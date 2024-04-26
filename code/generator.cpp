@@ -26,7 +26,7 @@ using namespace std;
 
 void put_object(vector<vector<Square>> parts, string shape,const std::string& filename){
 	//std::ofstream file("../build/3DFiles/" + filename);
-	std::ofstream file("build/3DFiles/" + filename);
+	std::ofstream file("3DFiles/" + filename);
 
     if (file.is_open()) {
         file << shape << "\n\n";
@@ -55,7 +55,7 @@ void put_object(vector<vector<Square>> parts, string shape,const std::string& fi
 }
 
 void put_patches(vector<vector<Coordenadas>> patches, string shape,const std::string& filename){
-	std::ofstream file("build/3DFiles/" + filename);
+	std::ofstream file("3DFiles/" + filename);
 
     if (file.is_open()) {
         file << shape << "\n\n";
@@ -463,7 +463,7 @@ void generate_patches(const std::string& fileInput, int tesselation, const std::
     int it = 0;
     int column = 0;
     int line = 0;
-	std::string newFileInput = "patches/" + fileInput;
+	std::string newFileInput = "../patches/" + fileInput;
     int nPatches = std::stoi(readLineinFile(newFileInput, 1));
     int nControlPoints = std::stoi(readLineinFile(newFileInput, nPatches + 2));
     std::vector<Coordenadas> texturas;
