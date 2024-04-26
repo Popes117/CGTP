@@ -54,15 +54,23 @@ struct Transform {
     Transform(std::string type, float time, bool align, std::vector<Coordenadas> pontos) :type(type), time(time), align(align), pontos(pontos) {}
 
 };
-
+class Model{
+    public:
+    GLuint vbo_id;
+    GLuint count;
+    std::vector<float> coords;
+    Model():vbo_id(), coords(){}
+};
+  
 class Group{
 	
 	public:
 
 	std::vector<Transform> transforms;
 	std::vector<std::string> model_paths;
+    std::vector<Model> models;
 	std::vector<Group> groups;
 
-	Group():transforms(), model_paths(), groups(){}
+	Group():transforms(), model_paths(), models(), groups(){}
 
 };
