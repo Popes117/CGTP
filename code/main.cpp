@@ -944,6 +944,50 @@ void draw_patches(const std::string& filename) {
     
 }
 
+void aux(){
+
+std::vector<GLfloat> vertices = {
+    // Quadrado 1 (triângulos formados pelas diagonais)
+    -1.0f, -1.0f, 0.0f,  // Vértice 1
+    1.0f, -1.0f, 0.0f,   // Vértice 2
+    1.0f, 1.0f, 0.0f,    // Vértice 3
+
+    1.0f, 1.0f, 0.0f,    // Vértice 3 (repetido)
+    -1.0f, 1.0f, 0.0f,   // Vértice 4
+    -1.0f, -1.0f, 0.0f,  // Vértice 1 (repetido)
+
+    // Quadrado 2 (triângulos formados pelas diagonais)
+    -1.0f, -1.0f, 0.0f,  // Vértice 1 (repetido)
+    1.0f, -1.0f, 0.0f,   // Vértice 2 (repetido)
+    -1.0f, 1.0f, 0.0f,   // Vértice 4 (repetido)
+
+    1.0f, -1.0f, 0.0f,   // Vértice 2 (repetido)
+    1.0f, 1.0f, 0.0f,    // Vértice 3 (repetido)
+    -1.0f, 1.0f, 0.0f    // Vértice 4 (repetido)
+};
+
+// Criar e configurar o buffer de vértices
+GLuint vbo;
+glGenBuffers(1, &vbo);
+glBindBuffer(GL_ARRAY_BUFFER, vbo);
+glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+
+// Habilitar o uso de arrays de vértices
+glEnableClientState(GL_VERTEX_ARRAY);
+
+// Definir o ponteiro para os vértices
+glVertexPointer(3, GL_FLOAT, 0, vertices.data());
+
+// Desenhar os quadrados
+glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
+
+glDisableClientState(GL_VERTEX_ARRAY);
+
+// Limpar o estado do buffer
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+}
+
 void renderScene(void) {
 
 	// clear buffers
@@ -973,7 +1017,8 @@ void renderScene(void) {
 
 	//cylinder0(1,2,10);
 	//plane(2,3);
-	draw_patches("build/3DFiles/bezier_10.3d");
+	//draw_patches("build/3DFiles/bezier_10.3d");
+	aux();	
 	//box(2,3);
 	//cone(1, 2, 4, 4);
 	//sphere(1,20,20);

@@ -26,7 +26,7 @@ using namespace std;
 
 void put_object(vector<vector<Square>> parts, string shape,const std::string& filename){
 	//std::ofstream file("../build/3DFiles/" + filename);
-	std::ofstream file("../build/3DFiles/" + filename);
+	std::ofstream file("build/3DFiles/" + filename);
 
     if (file.is_open()) {
         file << shape << "\n\n";

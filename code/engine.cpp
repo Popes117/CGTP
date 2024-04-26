@@ -23,6 +23,9 @@
 
 float alfa = 0.0f, betA = 0.0f, radius = 5.0f;
 float camX, camY, camZ;
+float elapsedTime = 0.0f;
+
+int timebase = 0, frame = 0;
 
 std::string filePath;
 std::vector<std::string> filePaths;
@@ -452,12 +455,10 @@ void draw_patches(const std::string& filename) {
     std::vector<std::vector<Coordenadas>> patches = parsePatches(filename);
 
     const auto& patch = patches[0]; // Acessa o primeiro patch
-    std::cout << "Nigger" << "\n";
 
     const auto& indexes = patches[1]; // Acessa os índices dos patches
 	glBegin(GL_TRIANGLES); 
     glColor3f(1.0f, 1.0f, 1.0f);
-    std::cout << "Comecei a desenhar" << "\n";
 	for (size_t i = 0; i < indexes.size(); i++) {
         const Coordenadas& ponto1 = patch[indexes[i].x]; 
         const Coordenadas& ponto2 = patch[indexes[i].y]; 
@@ -469,7 +470,6 @@ void draw_patches(const std::string& filename) {
         glVertex3f(ponto3.x, ponto3.y, ponto3.z);
 
     }
-    std::cout << "Acabei de desenhar" << "\n";
     glEnd(); 
     
 }
@@ -503,9 +503,20 @@ void handle_form(const std::string& filename){
         draw_sphere(filename);
     }
     else if (first_line == "patch") {
-        std::cout << "Vou desenhar um patch" << "\n";
         draw_patches(filename);
     }
+}
+
+void update(int value) {
+    // Atualizar o tempo e solicitar uma nova renderização
+
+    elapsedTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // Obter o tempo decorrido em segundos
+    glutPostRedisplay();
+    glutTimerFunc(16, update, 0);
+
+    //elapsedTime += 0.01f; // Incrementar o tempo decorrido
+    //glutPostRedisplay();
+    //glutTimerFunc(16, update, 0); // Redesenhar a cada 16 milissegundos (aproximadamente 60 FPS)
 }
 
 void handle_groups(const Group& group) {
@@ -515,8 +526,17 @@ void handle_groups(const Group& group) {
     for (const auto& transform : group.transforms) {
         if (transform.type == "translate") {
             glTranslatef(transform.x, transform.y, transform.z);
-        } else if (transform.type == "rotate") {
+        } else if (transform.type == "translateP") {
+            if(transform.align){
+
+            } else {
+                
+            }
+        } else if (transform.type == "rotateA") {
             glRotatef(transform.angle, transform.x, transform.y, transform.z);
+        } else if (transform.type == "rotateT") {
+            float angle = (elapsedTime / transform.angle) * 360.0f; 
+            glRotatef(angle, transform.x, transform.y, transform.z);
         } else if (transform.type == "scale") {
             glScalef(transform.x, transform.y, transform.z);
         }
@@ -705,7 +725,7 @@ void processTransformElement(tinyxml2::XMLElement* transformElement, Group& og_g
                     pointElement->QueryFloatAttribute("z", &pz);
                     points.push_back(Coordenadas(px, py, pz));
                 }
-                Transform transform = Transform("translate", time, align, points);
+                Transform transform = Transform("translateP", time, align, points);
                 og_group.transforms.push_back(transform);
             }
             else {
@@ -724,7 +744,7 @@ void processTransformElement(tinyxml2::XMLElement* transformElement, Group& og_g
                 child->QueryFloatAttribute("x", &rx);
                 child->QueryFloatAttribute("y", &ry);
                 child->QueryFloatAttribute("z", &rz);
-                Transform transform = Transform("rotateT", angle, rx, ry, rz);
+                Transform transform = Transform("rotateT", time, rx, ry, rz);
                 og_group.transforms.push_back(transform);
             }
             else {
@@ -749,7 +769,6 @@ void processTransformElement(tinyxml2::XMLElement* transformElement, Group& og_g
 }
 
     // guardar em variaveis globais
-}
 
 
  
@@ -849,6 +868,10 @@ int parsexml(const char *filename) {
 
 void renderScene(){
 
+	float fps;
+	int time;
+	char s[64];
+
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -874,9 +897,17 @@ void renderScene(){
 	glVertex3f(0.0f, 0.0f, 100.0f);
 	glEnd();
 	
-    std::cout << "renderScene" << std::endl;
-
     handle_groups(og_group);
+
+	frame++;
+	time=glutGet(GLUT_ELAPSED_TIME); 
+	if (time - timebase > 1000) { 
+		fps = frame*1000.0/(time-timebase); 
+		timebase = time; 
+		frame = 0; 
+		sprintf(s, "FPS: %f6.2", trunc(fps));
+		glutSetWindowTitle(s);
+	} 
 
 	// End of frame
 	glutSwapBuffers();
@@ -948,7 +979,8 @@ int main(int argc, char** argv){
 // Required callback registry 
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
-	
+    glutTimerFunc(16, update, 0);	
+
 // Callback registration for keyboard processing
 	glutKeyboardFunc(processKeys);
 	glutSpecialFunc(processSpecialKeys);
@@ -957,7 +989,6 @@ int main(int argc, char** argv){
 #ifndef __APPLE__
 	glewInit();
 #endif
-
 
 //  OpenGL settings
 	glEnable(GL_DEPTH_TEST);

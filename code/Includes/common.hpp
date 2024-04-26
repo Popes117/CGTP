@@ -53,7 +53,6 @@ struct Transform {
     Transform(std::string type, float angle, float x, float y, float z) :type(type), angle(angle), x(x), y(y), z(z) {}
     Transform(std::string type, float time, bool align, std::vector<Coordenadas> pontos) :type(type), time(time), align(align), pontos(pontos) {}
 
-
 };
 
 class Group{
