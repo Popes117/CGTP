@@ -59,6 +59,9 @@ int opcao;
 
 using namespace std;
 
+std::vector<GLuint> vertices;
+int counter = 1;
+
 // Stack de matrizes
 std::stack<Matrix> matrixStack;
 Group og_group = Group();
@@ -119,10 +122,10 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-std::vector<Square> parsePlane(const std::string& filename) {
+std::vector<float> parsePlane(const std::string& filename) {
 
 	std::string first_line;
-    std::vector<Square> triangles;
+    std::vector<float> pontos_a;
 	std::ifstream file(filename);
 	char separador;
     
@@ -144,73 +147,25 @@ std::vector<Square> parsePlane(const std::string& filename) {
         Square square;
 
         while (iss >> ponto.x >> ponto.y >> ponto.z) {
-            square.pontos.push_back(ponto);
+            pontos_a.push_back(ponto.x);
+            pontos_a.push_back(ponto.y);
+            pontos_a.push_back(ponto.z);
 			iss >> separador;
         }
-        triangles.push_back(square);
+        //triangles.push_back(square);
     }
 
-	return triangles;
+	return pontos_a;
 }
-/*
-std::vector<std::vector<Triangle>> parseBox(const std::string& filename) {
+
+std::vector<float> parseBox(const std::string& filename) {
     
     std::string first_line;
     int length;
     int divisions;
     int count = -1;
 
-    std::vector<std::vector<Triangle>> triangles;
-    triangles.push_back(std::vector<Triangle>()); // Bottom
-    triangles.push_back(std::vector<Triangle>()); // Top
-    triangles.push_back(std::vector<Triangle>()); // Side1
-    triangles.push_back(std::vector<Triangle>()); // Side2
-    triangles.push_back(std::vector<Triangle>()); // Side3
-    triangles.push_back(std::vector<Triangle>()); // Side4
-
-    std::ifstream file(filename);
-    char separador;
-
-    std::string linha;
-    if (std::getline(file, linha)) {
-        std::istringstream iss(linha);
-        iss >> first_line;
-    }
-
-    while (std::getline(file, linha)) {
-        if (linha.empty()) {
-            count++;
-        } else {
-            std::istringstream iss(linha);
-            Coordenadas ponto;
-            Triangle triangle;
-
-            while (iss >> ponto.p1 >> ponto.p2 >> ponto.p3) {
-                triangle.pontos.push_back(ponto);
-                iss >> separador;
-            }
-            triangles[count].push_back(triangle);
-        }
-    }
-
-    return triangles;
-}
-*/
-
-std::vector<std::vector<Square>> parseBox(const std::string& filename) {
-    
-    std::string first_line;
-    int length;
-    int divisions;
-    int count = -1;
-
-    std::vector<std::vector<Square>> squares;
-    squares.push_back(std::vector<Square>()); // Bottom
-    squares.push_back(std::vector<Square>()); // Top
-    squares.push_back(std::vector<Square>()); // Side1
-    squares.push_back(std::vector<Square>()); // Side2
-    squares.push_back(std::vector<Square>()); // Side3
-    squares.push_back(std::vector<Square>()); // Side4
+    std::vector<float> squares;
 
     std::ifstream file(filename);
     char separador;
@@ -230,10 +185,11 @@ std::vector<std::vector<Square>> parseBox(const std::string& filename) {
             Square square;
 
             while (iss >> ponto.x >> ponto.y >> ponto.z) {
-                square.pontos.push_back(ponto);
+                squares.push_back(ponto.x);
+                squares.push_back(ponto.y);
+                squares.push_back(ponto.z);
                 iss >> separador;
             }
-            squares[count].push_back(square);
         }
     }
 
@@ -241,7 +197,7 @@ std::vector<std::vector<Square>> parseBox(const std::string& filename) {
 }
 
 
-std::vector<std::vector<Square>> parseCone(const std::string& filename) {
+std::vector<float> parseCone(const std::string& filename) {
     
     std::string first_line;
     float radius; 
@@ -250,10 +206,7 @@ std::vector<std::vector<Square>> parseCone(const std::string& filename) {
     int stacks;
     int count = -1;
 
-    std::vector<std::vector<Square>> triangles;
-    triangles.push_back(std::vector<Square>()); // Bottom
-    triangles.push_back(std::vector<Square>()); // Stack
-    triangles.push_back(std::vector<Square>()); // Body
+    std::vector<float> triangles;
 
     std::ifstream file(filename);
     char separador;
@@ -270,24 +223,24 @@ std::vector<std::vector<Square>> parseCone(const std::string& filename) {
         } else {
             std::istringstream iss(linha);
             Coordenadas ponto;
-            Square triangle;
 
             while (iss >> ponto.x >> ponto.y >> ponto.z) {
-                triangle.pontos.push_back(ponto);
+                triangles.push_back(ponto.x);
+                triangles.push_back(ponto.y);
+                triangles.push_back(ponto.z);
                 iss >> separador;
             }
-            triangles[count].push_back(triangle);
         }
     }
 
     return triangles;
 }
 
-std::vector<Square> parseSphere(const std::string& filename) {
+std::vector<float> parseSphere(const std::string& filename) {
     int count = -1;
 
 	std::string first_line;
-    std::vector<Square> triangles;
+    std::vector<float> triangles;
 
     std::ifstream file(filename);
     char separador;
@@ -310,17 +263,18 @@ std::vector<Square> parseSphere(const std::string& filename) {
         Square triangle;
 
         while (iss >> ponto.x >> ponto.y >> ponto.z) {
-            triangle.pontos.push_back(ponto);
+            triangles.push_back(ponto.x);
+            triangles.push_back(ponto.y);
+            triangles.push_back(ponto.z);
 			iss >> separador;
         }
-        triangles.push_back(triangle);
     }
 
     return triangles;
 }
 
 
-std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
+std::vector<float> parsePatches(const std::string& filename) {
     std::string first_line;
 
     int count = -1;
@@ -328,8 +282,8 @@ std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
     std::vector<vector<Coordenadas>> coordenadas;
     coordenadas.push_back(std::vector<Coordenadas>()); // Bottom
     coordenadas.push_back(std::vector<Coordenadas>()); // Stack
-    coordenadas.push_back(std::vector<Coordenadas>()); // Body
     coordenadas.push_back(std::vector<Coordenadas>());
+    coordenadas.push_back(std::vector<Coordenadas>()); // Body
 
     std::ifstream file(filename);
     char separador;
@@ -339,46 +293,64 @@ std::vector<vector<Coordenadas>> parsePatches(const std::string& filename) {
         std::istringstream iss(linha);
         iss >> first_line;
     }
-
+    
     while (std::getline(file, linha)) {
         if (linha.empty()) {
             count++;
+            
         } else {
             std::istringstream iss(linha);
             Coordenadas ponto;
-
             while (iss >> ponto.x >> ponto.y >> ponto.z) {
                 coordenadas[count].push_back(ponto);
                 iss >> separador;
             }
         }
     }
+    
+    const auto& patch = coordenadas[0]; // Acessa o primeiro patch
 
-    return coordenadas;
+    const auto& indexes = coordenadas[1]; // Acessa os índices dos patches
+    std::vector<float> coors;
+    for (size_t i = 0; i < indexes.size(); i++) {
+        const Coordenadas& ponto1 = patch[indexes[i].x]; 
+        const Coordenadas& ponto2 = patch[indexes[i].y]; 
+        const Coordenadas& ponto3 = patch[indexes[i].z]; 
+
+        coors.push_back(ponto1.x);
+        coors.push_back(ponto1.y);
+        coors.push_back(ponto1.z);
+        coors.push_back(ponto2.x);
+        coors.push_back(ponto2.y);
+        coors.push_back(ponto2.z);
+        coors.push_back(ponto3.x);
+        coors.push_back(ponto3.y);
+        coors.push_back(ponto3.z);
+    }
+
+    return coors;
 
 }
 
 
-void draw_plane(const std::string& filename){
-
-    std::vector<Square> plane_triangles = parsePlane(filename);
-	
-	glBegin(GL_TRIANGLES);
+void draw_plane(GLuint vbo_id, GLuint count){
+	//glBegin(GL_TRIANGLES);
     glColor3f(1.0f, 1.0f, 1.0f);
-	for(Square square : plane_triangles){
+    std::cout << vbo_id << " "<< count << "\n";
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glDrawArrays(GL_TRIANGLES, 0, count);
+    glDisableClientState(GL_VERTEX_ARRAY);
 
-		glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z); 
-    	glVertex3f(square.pontos[1].x,square.pontos[1].y, square.pontos[1].z); 
-		glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z); 
-        glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z); 
-    	glVertex3f(square.pontos[3].x,square.pontos[3].y, square.pontos[3].z); 
-		glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z); 
-	}
-	glEnd();
+    // Limpar o estado do buffer
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//glEnd();
 
 }
 
-
+/*
 void draw_box(const std::string& filename){
 
 	std::vector<std::vector<Square>> box_squares = parseBox(filename);
@@ -473,38 +445,9 @@ void draw_patches(const std::string& filename) {
     glEnd(); 
     
 }
-
-void handle_form(const std::string& filename){
-	
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo: " << filename << std::endl;
-        return; // ou faça alguma outra coisa para lidar com o erro
-    }
-	std::string first_line;
-    
-    std::string linha;
-    
-    if (std::getline(file, linha)) {
-        std::istringstream iss(linha);
-        iss >> first_line;
-    }
-
-    if (first_line == "plane") {
-        draw_plane(filename);
-    }
-    else if (first_line == "box") {
-        draw_box(filename);
-    }
-    else if (first_line == "cone") {
-        draw_cone(filename);
-    }
-    else if (first_line == "sphere") {
-        draw_sphere(filename);
-    }
-    else if (first_line == "patch") {
-        draw_patches(filename);
-    }
+*/
+void handle_form(const Model &filename){
+    draw_plane(filename.vbo_id,filename.count);
 }
 
 void update(int value) {
@@ -542,8 +485,8 @@ void handle_groups(const Group& group) {
         }
     }
 
-    for (const auto& model_path : group.model_paths) {
-        handle_form(model_path);
+    for (const auto& model : group.models) {
+        handle_form(model);
     }
 
     for (const auto& sub_group : group.groups) {
@@ -676,10 +619,62 @@ void processTextureElement(tinyxml2::XMLElement* textureElement) {
 }
  
 void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
-    const char* file = modelElement->Attribute("file");
-    filePath = "build/3DFiles/" + std::string(file);
+    const char* file2 = modelElement->Attribute("file");
+    const std::string filename = "3DFiles/" + std::string(file2);
+    
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo: " << filename << std::endl;
+        return; // ou faça alguma outra coisa para lidar com o erro
+    }
+	std::string first_line;
+    
+    std::string linha;
+    
+    if (std::getline(file, linha)) {
+        std::istringstream iss(linha);
+        iss >> first_line;
+    }
+    std::vector<float> vetor;
+    if (first_line == "plane") {
+        vetor = parsePlane(filename);
+    }
+    else if (first_line == "box") {
+        vetor = parseBox(filename);
+    }
+    else if (first_line == "cone") {
+        vetor = parseCone(filename);
+    }
+    else if (first_line == "sphere") {
+        vetor = parseSphere(filename);
+    }
+    else if (first_line == "patch") {
+        vetor = parsePatches(filename);
+    }
+    Model m;
+    m.vbo_id = counter;
+    m.coords = vetor;
+    m.count = m.coords.size() / 3;
+    
+    GLuint vecLoc;
+    glGenBuffers(1,&m.vbo_id);
+
+    vertices.push_back(m.vbo_id);
+    std::cout << vertices[m.vbo_id] << "\n";
+    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_id);
+    glBufferData(
+     GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
+     sizeof(float) * m.coords.size(), // tamanho do vector em bytes
+     m.coords.data(), // os dados do array associado ao vector
+    GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
+
+
+    counter++;
+
     filePaths.push_back(filePath);
+
     og_group.model_paths.push_back(filePath);
+    og_group.models.push_back(m);
 
     /*
     if (strcmp(childName, "color") == 0) {
@@ -691,8 +686,8 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     }
     */
 
-    if (file) {
-        std::cout << "Model: File = " << file << std::endl;
+    if (file2) {
+        std::cout << "Model: File = " << file2 << std::endl;
     }
     else {
         std::cerr << "Model element is missing the 'file' attribute." << std::endl;
@@ -968,7 +963,7 @@ void printInfo() {
 
 int main(int argc, char** argv){
 
-    parsexml(argv[1]);
+
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
@@ -989,6 +984,7 @@ int main(int argc, char** argv){
 #ifndef __APPLE__
 	glewInit();
 #endif
+	parsexml(argv[1]);
 
 //  OpenGL settings
 	glEnable(GL_DEPTH_TEST);
