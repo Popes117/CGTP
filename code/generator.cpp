@@ -97,8 +97,10 @@ void generate_plane(int length, int divisions, const std::string& filename){
 			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x + lado_length, 0.0f, z + lado_length};
 			square.pontos.push_back(coordenadas3);
+			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas5 = {x + lado_length, 0.0f, z};
 			square.pontos.push_back(coordenadas5);
+			square.pontos.push_back(coordenadas1);
 
 			plane_triangles.push_back(square);
 
@@ -111,7 +113,6 @@ void generate_plane(int length, int divisions, const std::string& filename){
 	squared.push_back(plane_triangles);
 	put_object(squared, "plane", filename);
 }
-
 
 void generate_box(int length, int divisions, const std::string& filename){
 
@@ -142,8 +143,10 @@ void generate_box(int length, int divisions, const std::string& filename){
 			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x, y, z};
 			square.pontos.push_back(coordenadas3);
+			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x + lado_length, y, z};
 			square.pontos.push_back(coordenadas4);
+			square.pontos.push_back(coordenadas1);
 
 			bottom.push_back(square);			
 
@@ -170,8 +173,10 @@ void generate_box(int length, int divisions, const std::string& filename){
 			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x + lado_length, y, z + lado_length};
 			square.pontos.push_back(coordenadas3);
+			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x + lado_length, y, z};
 			square.pontos.push_back(coordenadas4);
+			square.pontos.push_back(coordenadas1);
 			
 			top.push_back(square);
 			
@@ -198,9 +203,10 @@ void generate_box(int length, int divisions, const std::string& filename){
 			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x, y + lado_length, z + lado_length};
 			square.pontos.push_back(coordenadas3);
+			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x, y + lado_length, z};
 			square.pontos.push_back(coordenadas4);
-			
+			square.pontos.push_back(coordenadas1);
 			side1.push_back(square);	
 
 			z += lado_length;
@@ -225,8 +231,10 @@ void generate_box(int length, int divisions, const std::string& filename){
 			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x, y, z};
 			square.pontos.push_back(coordenadas3);
+			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x, y + lado_length, z};
 			square.pontos.push_back(coordenadas4);
+			square.pontos.push_back(coordenadas1);
 			
 			side2.push_back(square);
 
@@ -253,8 +261,10 @@ void generate_box(int length, int divisions, const std::string& filename){
 			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x, y, z};
 			square.pontos.push_back(coordenadas3);
+			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x, y + lado_length, z};
 			square.pontos.push_back(coordenadas4);
+			square.pontos.push_back(coordenadas1);
 
 			side3.push_back(square);
 			
@@ -280,8 +290,10 @@ void generate_box(int length, int divisions, const std::string& filename){
 			square.pontos.push_back(coordenadas2);
 			Coordenadas coordenadas3 = {x + lado_length, y + lado_length, z};
 			square.pontos.push_back(coordenadas3);
+			square.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {x, y + lado_length, z};
 			square.pontos.push_back(coordenadas4);
+			square.pontos.push_back(coordenadas1);
 
 			side4.push_back(square);
 
@@ -301,6 +313,7 @@ void generate_box(int length, int divisions, const std::string& filename){
 	put_object(box_parts, "box", filename);
 
 }
+
 
 void generate_cone(float radius, float height, int slices,int stacks, const std::string& filename) {
 
@@ -358,6 +371,8 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 			triangle.pontos.push_back(coordenadas3);
 			Coordenadas coordenadas4 = {cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j)};
 			triangle.pontos.push_back(coordenadas4);
+			triangle.pontos.push_back(coordenadas1);
+			triangle.pontos.push_back(coordenadas3);
 			
 			body.push_back(triangle);	
 		}
@@ -369,7 +384,7 @@ void generate_cone(float radius, float height, int slices,int stacks, const std:
 
 }
 
-void generate_sphere(double radius, int slices, int stacks, const std::string& filename){
+void generate_sphere(float radius, int slices, int stacks, const std::string& filename){
     int i;
     float step;
     float n_stacks;
@@ -380,11 +395,11 @@ void generate_sphere(double radius, int slices, int stacks, const std::string& f
  
     // body
     for (i = 0; i < slices; i++) {
-    const double currentSlice = i * step;
+    const float currentSlice = i * step;
     for (int j = 0; j < stacks; j++) {
-        const double currentStack = j * n_stacks;
-        const double nextStack = currentStack + n_stacks;
-        const double nextSlice = currentSlice + step;
+        const float currentStack = j * n_stacks;
+        const float nextStack = currentStack + n_stacks;
+        const float nextSlice = currentSlice + step;
 
             Coordenadas p0 = { (radius * sin(nextStack) * sin(nextSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(nextSlice))};
             Coordenadas p1 = { (radius * sin(nextStack) * sin(currentSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(currentSlice)) };
@@ -397,6 +412,8 @@ void generate_sphere(double radius, int slices, int stacks, const std::string& f
             square.pontos.push_back(p3);
             square.pontos.push_back(p1);
             square.pontos.push_back(p2);
+            square.pontos.push_back(p3);
+            square.pontos.push_back(p0);
 
 			sphere_triangles.push_back(square);	
         }
