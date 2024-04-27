@@ -1,0 +1,105 @@
+<world>
+    <window width="1024" height="1024" />
+    <camera> 
+	    <position x="50" y="30" z="30" />
+	    <lookAt x="20" y="0" z="0" />
+	    <up x="0" y="1" z="0" /> <!-- optional, use these values as default-->
+        <projection fov="60" near="1" far="1000" /> <!-- optional, use these values as default-->
+    </camera>
+
+    <group>
+        <transform> 
+            <translate x="0" y="1" z="0" />
+        </transform>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="0" y="0" z="0" />
+                <scale x="8" y="8" z="8"/> <!-- Sol -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="13" y="0" z="0" />
+                <scale x="0.4" y="0.4" z="0.4"/> <!-- Mercurio -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="18" y="0" z="0" />
+                <scale x="1.2" y="1.2" z="1.2"/> <!-- Venus -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="23" y="0" z="0" />
+                <scale x="1.4" y="1.4" z="1.4"/> <!-- Terra -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="30" y="0" z="0" />
+                <scale x="0.6" y="0.6" z="0.6"/> <!-- Marte -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="50" y="0" z="0" />
+                <scale x="5" y="5" z="5"/> <!-- Jupiter -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="65" y="0" z="0" />
+                <scale x="4" y="4" z="4"/> <!-- Saturno -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="80" y="0" z="0" />
+                <scale x="3" y="3" z="3"/> <!-- Neptuno -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" /> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate angle="90" x="0" y ="1" z = "0" />
+                <translate x="95" y="0" z="0" />
+                <scale x="3" y="3" z="3"/> <!-- Urano -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" />
+			</models>
+        </group>
+	</group>
+</world>
