@@ -37,6 +37,7 @@ int timebase = 0, frame = 0;
 
 std::string filePath;
 std::vector<std::string> filePaths;
+std::vector<Light> lights;
 
 int widtH;
 int heighT;
@@ -293,13 +294,17 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-std::vector<float> parsePlane(const std::string& filename) {
+std::vector<vector<float>> parsePlane(const std::string& filename) {
 
 	std::string first_line;
+    std::vector<vector<float>> pontos;
     std::vector<float> pontos_a;
+    std::vector<float> pontos_tex;
+    std::vector<float> pontos_norm;
 	std::ifstream file(filename);
 	char separador;
-    
+    int count = 0;
+
     std::string linha;
     
     if (std::getline(file, linha)) {
@@ -310,6 +315,7 @@ std::vector<float> parsePlane(const std::string& filename) {
     while (std::getline(file, linha)) {
         
         if (linha.empty()) {
+            count++;
             continue;
         }
 
@@ -317,16 +323,39 @@ std::vector<float> parsePlane(const std::string& filename) {
         Coordenadas ponto;
         Square square;
 
-        while (iss >> ponto.x >> ponto.y >> ponto.z) {
-            pontos_a.push_back(ponto.x);
-            pontos_a.push_back(ponto.y);
-            pontos_a.push_back(ponto.z);
-			iss >> separador;
+        if(count < 2){
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_a.push_back(ponto.x);
+                pontos_a.push_back(ponto.y);
+                pontos_a.push_back(ponto.z);
+		    	iss >> separador;
+            }
         }
-        //triangles.push_back(square);
+
+        else if (count == 2){
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_tex.push_back(ponto.x);
+                pontos_tex.push_back(ponto.y);
+                pontos_tex.push_back(ponto.z);
+                iss >> separador;
+            }
+        }
+
+        else {
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_norm.push_back(ponto.x);
+                pontos_norm.push_back(ponto.y);
+                pontos_norm.push_back(ponto.z);
+                iss >> separador;
+            }
+        }
     }
 
-	return pontos_a;
+    pontos.push_back(pontos_a);
+    pontos.push_back(pontos_tex);
+    pontos.push_back(pontos_norm);
+
+	return pontos;
 }
 
 std::vector<float> parseBox(const std::string& filename) {
@@ -445,11 +474,12 @@ std::vector<float> parseSphere(const std::string& filename) {
 }
 
 
-std::vector<float> parsePatches(const std::string& filename) {
+std::vector<vector<float>> parsePatches(const std::string& filename) {
     std::string first_line;
 
     int count = -1;
 
+    std::vector<vector<float>> vectors;
     std::vector<vector<Coordenadas>> coordenadas;
     coordenadas.push_back(std::vector<Coordenadas>()); // Bottom
     coordenadas.push_back(std::vector<Coordenadas>()); // Stack
@@ -480,13 +510,24 @@ std::vector<float> parsePatches(const std::string& filename) {
     }
     
     const auto& patch = coordenadas[0]; // Acessa o primeiro patch
-
     const auto& indexes = coordenadas[1]; // Acessa os índices dos patches
+    const auto& normals = coordenadas[2]; // Acessa as normais dos patches
+    const auto& textures = coordenadas[3]; // Acessa as texturas dos patches
+
     std::vector<float> coors;
+    std::vector<float> norms;
+    std::vector<float> texs;
+
     for (size_t i = 0; i < indexes.size(); i++) {
         const Coordenadas& ponto1 = patch[indexes[i].x]; 
         const Coordenadas& ponto2 = patch[indexes[i].y]; 
         const Coordenadas& ponto3 = patch[indexes[i].z]; 
+        const Coordenadas& normal1 = normals[indexes[i].x];
+        const Coordenadas& normal2 = normals[indexes[i].y];
+        const Coordenadas& normal3 = normals[indexes[i].z];
+        const Coordenadas& texture1 = textures[indexes[i].x];
+        const Coordenadas& texture2 = textures[indexes[i].y];
+        const Coordenadas& texture3 = textures[indexes[i].z];
 
         coors.push_back(ponto1.x);
         coors.push_back(ponto1.y);
@@ -497,21 +538,62 @@ std::vector<float> parsePatches(const std::string& filename) {
         coors.push_back(ponto3.x);
         coors.push_back(ponto3.y);
         coors.push_back(ponto3.z);
+
+        norms.push_back(normal1.x);
+        norms.push_back(normal1.y);
+        norms.push_back(normal1.z);
+        norms.push_back(normal2.x);
+        norms.push_back(normal2.y);
+        norms.push_back(normal2.z);
+        norms.push_back(normal3.x);
+        norms.push_back(normal3.y);
+        norms.push_back(normal3.z);
+
+        texs.push_back(texture1.x);
+        texs.push_back(texture1.y);
+        texs.push_back(texture2.x);
+        texs.push_back(texture2.y);
+        texs.push_back(texture3.x);
+        texs.push_back(texture3.y);
     }
 
-    return coors;
+    vectors.push_back(coors);
+    vectors.push_back(texs);
+    vectors.push_back(norms);
 
+    return vectors;
 }
 
 
-void draw_model(GLuint vbo_id, GLuint count){
+void draw_model(Model &m){
 	//glBegin(GL_TRIANGLES);
+
+    if(lights.size() > 0){
+        for (Light& light : lights)
+            light.apply();
+    }
+
+    if (m.hasTexture)
+        m.texture.apply();
+
+    if(m.hasColor)
+        m.color.apply();
+
     glColor3f(1.0f, 1.0f, 1.0f);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+
     glEnableClientState(GL_VERTEX_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[0]);
     glVertexPointer(3, GL_FLOAT, 0, 0);
-    glDrawArrays(GL_TRIANGLES, 0, count);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[2]);
+    glNormalPointer(GL_FLOAT,0,0);
+    
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
+    glTexCoordPointer(2, GL_FLOAT, 0, 0);
+    
+    glDrawArrays(GL_TRIANGLES, 0, m.count);
 
     // Limpar o estado do buffer
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -616,8 +698,8 @@ void draw_patches(const std::string& filename) {
     
 }
 */
-void handle_form(const Model &filename){
-    draw_model(filename.vbo_id,filename.count);
+void handle_form(Model &filename){
+    draw_model(filename);
 }
 
 void update(int value) {
@@ -651,7 +733,7 @@ void handle_groups(const Group& group) {
         }
     }
 
-    for (const auto& model : group.models) {
+    for (Model model : group.models) {
         handle_form(model);
     }
 
@@ -742,51 +824,75 @@ void processCameraElement(tinyxml2::XMLElement* cameraElement) {
 
 }
 
-void processColorElement(tinyxml2::XMLElement* colorElement) {
+void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
     float dr, dg, db, ar, ag, ab, sr, sg, sb, er, eg, eb, value;
-
+    Color color = Color();
     for (tinyxml2::XMLElement* child = colorElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
 
         if (strcmp(childName, "diffuse") == 0) {
+            color.hasDiffuse = true;
             child->QueryFloatAttribute("R", &dr);
             child->QueryFloatAttribute("g", &dg);
             child->QueryFloatAttribute("b", &db);
+            Coordenadas diff = {dr, dg, db};
+            color.diffuse = diff;
         }
         else if (strcmp(childName, "ambient") == 0) {
+            color.hasAmbient = true;
             child->QueryFloatAttribute("R", &ar);
             child->QueryFloatAttribute("g", &ag);
             child->QueryFloatAttribute("b", &ab);
+            Coordenadas amb = {ar, ag, ab};
+            color.ambient = amb;
         }
         else if (strcmp(childName, "specular") == 0) {
+            color.hasSpecular = true;
             child->QueryFloatAttribute("R", &sr);
             child->QueryFloatAttribute("g", &sg);
             child->QueryFloatAttribute("b", &sb);
+            Coordenadas spec = {sr, sg, sb};
+            color.specular = spec;
+        }
+        else if(strcmp(childName, "emissive") == 0){
+            color.hasEmissive = true;
+            child->QueryFloatAttribute("R", &er);
+            child->QueryFloatAttribute("g", &eg);
+            child->QueryFloatAttribute("b", &eb);
+            Coordenadas emis = {er, eg, eb};
+            color.emissive = emis;
         }
         else if (strcmp(childName, "shininess") == 0) {
             child->QueryFloatAttribute("value", &value);
+            color.shininess = value;
         }
+    m.color = color;
     }
 
     // guardar em variaveis globais
 }
 
-void processTextureElement(tinyxml2::XMLElement* textureElement) {
+void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
     const char* file = textureElement->Attribute("file");
-    filePath = "3DFiles/" + std::string(file);
+    filePath = "build/textures/" + std::string(file);
     filePaths.push_back(filePath);
 
     if (file) {
-        std::cout << "Model: File = " << file << std::endl;
+        std::cout << "Texture: File = " << file << std::endl;
     }
     else {
-        std::cerr << "Model element is missing the 'file' attribute." << std::endl;
+        std::cerr << "Texture element is missing the 'file' attribute." << std::endl;
     }
+
+    Texture texture = Texture(filePath);
+    texture.prep();
+    m.texture = texture;
+    m.hasTexture = true;
 }
  
 void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     const char* file2 = modelElement->Attribute("file");
-    const std::string filename = "3DFiles/" + std::string(file2);
+    const std::string filename = "build/3DFiles/" + std::string(file2);
     
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -802,8 +908,9 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
         iss >> first_line;
     }
     std::vector<float> vetor;
+    std::vector<std::vector<float>> pontos;
     if (first_line == "plane") {
-        vetor = parsePlane(filename);
+        pontos = parsePlane(filename);
     }
     else if (first_line == "box") {
         vetor = parseBox(filename);
@@ -815,41 +922,65 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
         vetor = parseSphere(filename);
     }
     else if (first_line == "patch") {
-        vetor = parsePatches(filename);
+        pontos = parsePatches(filename);
     }
-    Model m;
-    m.vbo_id = counter;
-    m.coords = vetor;
-    m.count = m.coords.size() / 3;
+    Model m = Model();
+    m.vbo_ids[0] = counter;
+    m.vbo_ids[1] = counter + 1;
+    m.vbo_ids[2] = counter + 2;
+    m.coords.push_back(pontos[0]);
+    m.coords.push_back(pontos[1]);
+    m.coords.push_back(pontos[2]);
+    m.count = pontos[0].size() / 3;
     
     GLuint vecLoc;
-    glGenBuffers(1,&m.vbo_id);
+    glGenBuffers(1,&m.vbo_ids[0]);
+    glGenBuffers(1,&m.vbo_ids[1]);
+    glGenBuffers(1,&m.vbo_ids[2]);
 
-    vertices.push_back(m.vbo_id);
-    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_id);
+    vertices.push_back(m.vbo_ids[0]);
+    vertices.push_back(m.vbo_ids[1]);
+    vertices.push_back(m.vbo_ids[2]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[0]);
     glBufferData(
      GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
-     sizeof(float) * m.coords.size(), // tamanho do vector em bytes
-     m.coords.data(), // os dados do array associado ao vector
+     sizeof(float) * m.coords[0].size(), // tamanho do vector em bytes
+     m.coords[0].data(), // os dados do array associado ao vector
     GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
+    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
+    glBufferData(
+     GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
+     sizeof(float) * m.coords[1].size(), // tamanho do vector em bytes
+     m.coords[1].data(), // os dados do array associado ao vector
+    GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
-    counter++;
+    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[2]);
+    glBufferData(
+     GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
+     sizeof(float) * m.coords[2].size(), // tamanho do vector em bytes
+     m.coords[2].data(), // os dados do array associado ao vector
+    GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
+
+    counter+=3;
 
     filePaths.push_back(filePath);
 
     og_group.model_paths.push_back(filePath);
     og_group.models.push_back(m);
 
-    /*
+for (tinyxml2::XMLElement* child = modelElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+    const char* childName = child->Name();
+
     if (strcmp(childName, "color") == 0) {
-        processColorElement(child);
+        processColorElement(child, m);
     }
 
     if (strcmp(childName, "texture") == 0) {
-        processTextureElement(child);
-    }
-    */
+        processTextureElement(child, m);
+    }   
+}
 
     if (file2) {
         std::cout << "Model: File = " << file2 << std::endl;
@@ -957,35 +1088,52 @@ void processGroupElement(tinyxml2::XMLElement* groupElement, Group& og_group) {
     }
 
 }
- 
-void processLightElement(tinyxml2::XMLElement* lightElement) {
+
+void processLightElement(tinyxml2::XMLElement* child) {
     float px, py, pz, dx, dy, dz, sx, sy, sz, sdx, sdy, sdz, c;
 
-    for (tinyxml2::XMLElement* child = lightElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
-        const char* childName = child->Name();
+    const char* childName = child->Attribute("type");
+    Light light = Light();
 
-        if (strcmp(childName, "point") == 0) {
-            child->QueryFloatAttribute("posX", &px);
-            child->QueryFloatAttribute("posY", &py);
-            child->QueryFloatAttribute("posZ", &pz);
-        }
-        else if (strcmp(childName, "directional") == 0) {
-            child->QueryFloatAttribute("dirX", &dx);
-            child->QueryFloatAttribute("dirY", &dy);
-            child->QueryFloatAttribute("dirZ", &dz);
-        }
-        else if (strcmp(childName, "spotlight") == 0) {
-            child->QueryFloatAttribute("posX", &sx);
-            child->QueryFloatAttribute("posY", &sy);
-            child->QueryFloatAttribute("posZ", &sz);
-            child->QueryFloatAttribute("dirX", &sdx);
-            child->QueryFloatAttribute("dirY", &sdy);
-            child->QueryFloatAttribute("dirZ", &sdz);
-            child->QueryFloatAttribute("cutoff", &c);
-        }
+    if (strcmp(childName, "point") == 0) {
+        child->QueryFloatAttribute("posx", &px);
+        child->QueryFloatAttribute("posy", &py);
+        child->QueryFloatAttribute("posz", &pz);
+        light.position = Coordenadas(px, py, pz);
+        light.hasPosition = true;
+    }
+    else if (strcmp(childName, "directional") == 0) {
+        child->QueryFloatAttribute("dirx", &dx);
+        child->QueryFloatAttribute("diry", &dy);
+        child->QueryFloatAttribute("dirz", &dz);
+        light.direction = Coordenadas(dx, dy, dz);
+        light.hasDirection = true;
+    }
+    else if (strcmp(childName, "spotlight") == 0) {
+        child->QueryFloatAttribute("posx", &sx);
+        child->QueryFloatAttribute("posy", &sy);
+        child->QueryFloatAttribute("posz", &sz);
+        child->QueryFloatAttribute("dirx", &sdx);
+        child->QueryFloatAttribute("diry", &sdy);
+        child->QueryFloatAttribute("dirz", &sdz);
+        child->QueryFloatAttribute("cutoff", &c);
+        light.position = Coordenadas(sx, sy, sz);
+        light.direction = Coordenadas(sdx, sdy, sdz);
+        light.cutoff = c;
+        light.hasPosition = true;
+        light.hasDirection = true;
     }
 
+    light.prep();
+    lights.push_back(light);
+
     // guardar em variaveis globais
+}
+
+void processLightsElement(tinyxml2::XMLElement* lightsElement) {
+    for (tinyxml2::XMLElement* modelElement = lightsElement->FirstChildElement("light"); modelElement; modelElement = modelElement->NextSiblingElement("light")) {
+        processLightElement(modelElement);
+    }
 }
 
 void processWorldElement(tinyxml2::XMLElement* worldElement) {
@@ -996,11 +1144,10 @@ void processWorldElement(tinyxml2::XMLElement* worldElement) {
             processCameraElement(child);
         }
         else if (strcmp(childName, "group") == 0) {
-
             processGroupElement(child, og_group);
         }
-        else if (strcmp(childName, "light") == 0) {
-            processLightElement(child);
+        else if (strcmp(childName, "lights") == 0) {
+            processLightsElement(child);
         }
     }
 }
