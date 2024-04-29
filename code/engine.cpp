@@ -577,11 +577,8 @@ void draw_model(Model &m){
     if (m.hasTexture)
         m.texture.apply();
 
-    if(m.hasColor){
-        std::cout << "Color: " << m.color.diffuse.x << " " << m.color.diffuse.y << " " << m.color.diffuse.z << std::endl;
-        std::cout << "Diffuse: " << m.color.diffuse.x << " " << m.color.diffuse.y << " " << m.color.diffuse.z << std::endl;
+    if(m.hasColor)
         m.color.apply();
-    }
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -839,7 +836,6 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
             child->QueryFloatAttribute("R", &dr);
             child->QueryFloatAttribute("G", &dg);
             child->QueryFloatAttribute("B", &db);
-            std::cout << "Diffuse: " << dr << " " << dg << " " << db << std::endl;
             Coordenadas diff = {dr, dg, db};
             color.diffuse = diff;
         }
@@ -873,7 +869,6 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
         }
     }
     m.color = color;
-    std::cout << "Diffuse: " << m.color.diffuse.x << " " << m.color.diffuse.y << " " << m.color.diffuse.z << std::endl;
     // guardar em variaveis globais
 }
 
@@ -971,9 +966,7 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     counter+=3;
 
     filePaths.push_back(filePath);
-
     og_group.model_paths.push_back(filePath);
-    og_group.models.push_back(m);
 
 for (tinyxml2::XMLElement* child = modelElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
     const char* childName = child->Name();
@@ -986,6 +979,8 @@ for (tinyxml2::XMLElement* child = modelElement->FirstChildElement(); child; chi
         processTextureElement(child, m);
     }   
 }
+
+    og_group.models.push_back(m);
 
     if (file2) {
         std::cout << "Model: File = " << file2 << std::endl;
