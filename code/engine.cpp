@@ -569,15 +569,19 @@ void draw_model(Model &m){
 	//glBegin(GL_TRIANGLES);
 
     if(lights.size() > 0){
-        for (Light& light : lights)
+        for (Light& light : lights){
             light.apply();
+        }
     }
 
     if (m.hasTexture)
         m.texture.apply();
 
-    if(m.hasColor)
+    if(m.hasColor){
+        std::cout << "Color: " << m.color.diffuse.x << " " << m.color.diffuse.y << " " << m.color.diffuse.z << std::endl;
+        std::cout << "Diffuse: " << m.color.diffuse.x << " " << m.color.diffuse.y << " " << m.color.diffuse.z << std::endl;
         m.color.apply();
+    }
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -589,9 +593,10 @@ void draw_model(Model &m){
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[2]);
     glNormalPointer(GL_FLOAT,0,0);
     
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
-    glTexCoordPointer(2, GL_FLOAT, 0, 0);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    //glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
+    //glTexCoordPointer(2, GL_FLOAT, 0, 0);
     
     glDrawArrays(GL_TRIANGLES, 0, m.count);
 
@@ -829,36 +834,36 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
     Color color = Color();
     for (tinyxml2::XMLElement* child = colorElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
-
         if (strcmp(childName, "diffuse") == 0) {
             color.hasDiffuse = true;
             child->QueryFloatAttribute("R", &dr);
-            child->QueryFloatAttribute("g", &dg);
-            child->QueryFloatAttribute("b", &db);
+            child->QueryFloatAttribute("G", &dg);
+            child->QueryFloatAttribute("B", &db);
+            std::cout << "Diffuse: " << dr << " " << dg << " " << db << std::endl;
             Coordenadas diff = {dr, dg, db};
             color.diffuse = diff;
         }
         else if (strcmp(childName, "ambient") == 0) {
             color.hasAmbient = true;
             child->QueryFloatAttribute("R", &ar);
-            child->QueryFloatAttribute("g", &ag);
-            child->QueryFloatAttribute("b", &ab);
+            child->QueryFloatAttribute("G", &ag);
+            child->QueryFloatAttribute("B", &ab);
             Coordenadas amb = {ar, ag, ab};
             color.ambient = amb;
         }
         else if (strcmp(childName, "specular") == 0) {
             color.hasSpecular = true;
             child->QueryFloatAttribute("R", &sr);
-            child->QueryFloatAttribute("g", &sg);
-            child->QueryFloatAttribute("b", &sb);
+            child->QueryFloatAttribute("G", &sg);
+            child->QueryFloatAttribute("B", &sb);
             Coordenadas spec = {sr, sg, sb};
             color.specular = spec;
         }
         else if(strcmp(childName, "emissive") == 0){
             color.hasEmissive = true;
             child->QueryFloatAttribute("R", &er);
-            child->QueryFloatAttribute("g", &eg);
-            child->QueryFloatAttribute("b", &eb);
+            child->QueryFloatAttribute("G", &eg);
+            child->QueryFloatAttribute("B", &eb);
             Coordenadas emis = {er, eg, eb};
             color.emissive = emis;
         }
@@ -866,9 +871,9 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
             child->QueryFloatAttribute("value", &value);
             color.shininess = value;
         }
-    m.color = color;
     }
-
+    m.color = color;
+    std::cout << "Diffuse: " << m.color.diffuse.x << " " << m.color.diffuse.y << " " << m.color.diffuse.z << std::endl;
     // guardar em variaveis globais
 }
 
