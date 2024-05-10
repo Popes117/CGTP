@@ -1,13 +1,13 @@
 [
 {
   "directory": "/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/build",
-  "command": "/usr/bin/g++   -g -o CMakeFiles/engine.dir/engine.cpp.o -c \"/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/engine.cpp\"",
+  "command": "/usr/bin/g++  -isystem /usr/include/IL -g -o CMakeFiles/engine.dir/engine.cpp.o -c \"/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/engine.cpp\"",
   "file": "/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/engine.cpp",
   "output": "CMakeFiles/engine.dir/engine.cpp.o"
 },
 {
   "directory": "/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/build",
-  "command": "/usr/bin/g++   -g -o CMakeFiles/engine.dir/tinyxml2-master/tinyxml2.cpp.o -c \"/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/tinyxml2-master/tinyxml2.cpp\"",
+  "command": "/usr/bin/g++  -isystem /usr/include/IL -g -o CMakeFiles/engine.dir/tinyxml2-master/tinyxml2.cpp.o -c \"/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/tinyxml2-master/tinyxml2.cpp\"",
   "file": "/home/popes/Desktop/3ºAno 2ºSemestre/CGBLA/cg24/code/tinyxml2-master/tinyxml2.cpp",
   "output": "CMakeFiles/engine.dir/tinyxml2-master/tinyxml2.cpp.o"
 },

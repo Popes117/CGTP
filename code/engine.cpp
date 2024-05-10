@@ -32,6 +32,7 @@ float elapsedTime = 0.0f;
 
 bool draw_curve = true;
 bool draw_axis = true;
+bool draw_mode = true;
 
 int timebase = 0, frame = 0;
 
@@ -336,7 +337,7 @@ std::vector<vector<float>> parsePlane(const std::string& filename) {
             while (iss >> ponto.x >> ponto.y >> ponto.z) {
                 pontos_tex.push_back(ponto.x);
                 pontos_tex.push_back(ponto.y);
-                pontos_tex.push_back(ponto.z);
+                std::cout << ponto.x << " "  << ponto.y << std::endl;
                 iss >> separador;
             }
         }
@@ -573,12 +574,12 @@ void draw_model(Model &m){
             light.apply();
         }
     }
-
-    if (m.hasTexture)
-        m.texture.apply();
-
-    if(m.hasColor)
+    
+    if(m.hasColor){
+        glEnable(GL_LIGHTING);
+	    glEnable(GL_LIGHT0);	
         m.color.apply();
+    }
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -589,11 +590,13 @@ void draw_model(Model &m){
     glEnableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[2]);
     glNormalPointer(GL_FLOAT,0,0);
-    
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    //glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
-    //glTexCoordPointer(2, GL_FLOAT, 0, 0);
+
+    if (m.hasTexture){
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
+        m.texture.apply();
+        glTexCoordPointer(2, GL_FLOAT, 0, 0);
+    }
     
     glDrawArrays(GL_TRIANGLES, 0, m.count);
 
@@ -869,7 +872,7 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
         }
     }
     m.color = color;
-    // guardar em variaveis globais
+    m.hasColor = true;
 }
 
 void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
@@ -884,7 +887,9 @@ void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
         std::cerr << "Texture element is missing the 'file' attribute." << std::endl;
     }
 
+    std::cout << "CARALHOOOOOOOO" << std::endl;
     Texture texture = Texture(filePath);
+    std::cout << "Tou no prep" << std::endl;
     texture.prep();
     m.texture = texture;
     m.hasTexture = true;
@@ -925,6 +930,8 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
         pontos = parsePatches(filename);
     }
     Model m = Model();
+    m.hasColor = false;
+    m.hasTexture = false;
     m.vbo_ids[0] = counter;
     m.vbo_ids[1] = counter + 1;
     m.vbo_ids[2] = counter + 2;
@@ -972,6 +979,7 @@ for (tinyxml2::XMLElement* child = modelElement->FirstChildElement(); child; chi
     const char* childName = child->Name();
 
     if (strcmp(childName, "color") == 0) {
+        std::cout << "Tou a entrar no processColor" << std::endl;
         processColorElement(child, m);
     }
 
@@ -1323,6 +1331,11 @@ void processKeys(unsigned char c, int xx, int yy) {
         case 'X':   
             draw_axis = !draw_axis;
             break;
+        case 'm':
+        case 'M':   
+            draw_mode = !draw_mode;
+            glPolygonMode(GL_FRONT, draw_mode ? GL_LINE : GL_FILL);
+            break;
 
         default:
             break;
@@ -1389,7 +1402,7 @@ int main(int argc, char** argv){
 // Required callback registry 
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
-    glutTimerFunc(16, update, 0);	
+    glutTimerFunc(16, update, 0);
 
 // Callback registration for keyboard processing
 	glutKeyboardFunc(processKeys);
@@ -1406,7 +1419,7 @@ int main(int argc, char** argv){
 //  OpenGL settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_FRONT, GL_FILL);
 
 	spherical2Cartesian();
 

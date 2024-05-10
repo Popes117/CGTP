@@ -80,9 +80,13 @@ class Texture{
 
     void prep(){
 
+        ilInit();
+	    ilEnable(IL_ORIGIN_SET);
+	    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
         ilGenImages(1,&t);
         ilBindImage(t);
         ilLoadImage(path.data());
+        std::cout << path << std::endl;
         tw = ilGetInteger(IL_IMAGE_WIDTH);
         th = ilGetInteger(IL_IMAGE_HEIGHT);
         ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
@@ -121,7 +125,7 @@ class Color{
         }
 
     void apply(){
-        float diffuseArr[4] = {diffuse.x, diffuse.y, diffuse.z, 1.0};
+        float diffuseArr[4] = {diffuse.x/255, diffuse.y/255, diffuse.z/255, 1.0};
         float ambientArr[4] = {ambient.x, ambient.y, ambient.z, 1.0};
         float specularArr[4] = {specular.x, specular.y, specular.z, 1.0};
         float emissiveArr[4] = {emissive.x, emissive.y, emissive.z, 1.0};
