@@ -890,6 +890,10 @@ void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
     std::cout << "CARALHOOOOOOOO" << std::endl;
     Texture texture = Texture(filePath);
     std::cout << "Tou no prep" << std::endl;
+    GLenum err;
+    if ((err = glGetError()) != GL_NO_ERROR) {
+        std::cerr << "Erro ao gerar textura BLA: " << gluErrorString(err) << std::endl;
+    }
     texture.prep();
     m.texture = texture;
     m.hasTexture = true;

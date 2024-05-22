@@ -81,6 +81,11 @@ class Texture{
 
     void prep(){
 
+        GLenum err;
+        if ((err = glGetError()) != GL_NO_ERROR) {
+            std::cerr << "Erro ao gerar textura: " << gluErrorString(err) << std::endl;
+        }
+
         ilInit();
 	    ilEnable(IL_ORIGIN_SET);
 	    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
@@ -97,11 +102,9 @@ class Texture{
         ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
         texData = ilGetData();
 
-        GLenum err;
+
         glGenTextures(1, &texID);
-        if ((err = glGetError()) != GL_NO_ERROR) {
-            std::cerr << "Erro ao gerar textura: " << gluErrorString(err) << std::endl;
-        }
+
 
         glBindTexture(GL_TEXTURE_2D, texID);
         if ((err = glGetError()) != GL_NO_ERROR) {
@@ -112,7 +115,7 @@ class Texture{
         //glBindTexture(GL_TEXTURE_2D,tex);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
         //glGenerateMipmap(GL_TEXTURE_2D);
@@ -122,7 +125,6 @@ class Texture{
             std::cerr << "Erro ao configurar parâmetros de textura: " << gluErrorString(err) << std::endl;
             return;
         }
-        std::cout << "Textura carregada com sucesso" << std::endl; //Não faz este print
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
         err = glGetError();
@@ -137,6 +139,8 @@ class Texture{
             std::cerr << "Erro ao gerar mipmap: " << gluErrorString(err) << std::endl;
             return;
         }
+        std::cout << "Textura carregada com sucesso" << std::endl; //Não faz este print
+
     }
 
     void apply(){
