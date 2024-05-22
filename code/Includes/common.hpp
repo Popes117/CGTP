@@ -68,7 +68,8 @@ struct Transform {
 class Texture{
     public:
         GLuint texture_id;
-        unsigned int t, tw, th, tex;
+        unsigned int t, tw, th;
+        unsigned int texID;
         unsigned char *texData;
         std::string path;
     public:
@@ -85,26 +86,61 @@ class Texture{
 	    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
         ilGenImages(1,&t);
         ilBindImage(t);
-        ilLoadImage(path.data());
+        //ilLoadImage(path.data());
+        if (!ilLoadImage(path.data())) {
+            std::cerr << "Erro ao carregar a imagem: " << path << std::endl;
+            return;
+        }
         std::cout << path << std::endl;
         tw = ilGetInteger(IL_IMAGE_WIDTH);
         th = ilGetInteger(IL_IMAGE_HEIGHT);
         ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
         texData = ilGetData();
 
-        glGenTextures(1,&tex);
-        glBindTexture(GL_TEXTURE_2D,tex);
+        GLenum err;
+        glGenTextures(1, &texID);
+        if ((err = glGetError()) != GL_NO_ERROR) {
+            std::cerr << "Erro ao gerar textura: " << gluErrorString(err) << std::endl;
+        }
+
+        glBindTexture(GL_TEXTURE_2D, texID);
+        if ((err = glGetError()) != GL_NO_ERROR) {
+            std::cerr << "Erro ao vincular textura: " << gluErrorString(err) << std::endl;
+        }
+
+        //glGenTextures(1,&tex);
+        //glBindTexture(GL_TEXTURE_2D,tex);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+        //glGenerateMipmap(GL_TEXTURE_2D);
 
+        err = glGetError();
+        if (err != GL_NO_ERROR) {
+            std::cerr << "Erro ao configurar parâmetros de textura: " << gluErrorString(err) << std::endl;
+            return;
+        }
+        std::cout << "Textura carregada com sucesso" << std::endl; //Não faz este print
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+        err = glGetError();
+        if (err != GL_NO_ERROR) {
+            std::cerr << "Erro ao carregar dados da textura: " << gluErrorString(err) << std::endl;
+            return;
+        }
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+        err = glGetError();
+        if (err != GL_NO_ERROR) {
+            std::cerr << "Erro ao gerar mipmap: " << gluErrorString(err) << std::endl;
+            return;
+        }
     }
 
     void apply(){
-        glBindTexture(GL_TEXTURE_2D, tex);
+        glBindTexture(GL_TEXTURE_2D, texID);
     }
 
 };

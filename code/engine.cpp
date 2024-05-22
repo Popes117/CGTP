@@ -596,7 +596,7 @@ void draw_model(Model &m){
         glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
         m.texture.apply();
         glTexCoordPointer(2, GL_FLOAT, 0, 0);
-    }
+    } else glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     
     glDrawArrays(GL_TRIANGLES, 0, m.count);
 
@@ -877,7 +877,7 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
 
 void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
     const char* file = textureElement->Attribute("file");
-    filePath = "build/textures/" + std::string(file);
+    filePath = "../build/textures/" + std::string(file);
     filePaths.push_back(filePath);
 
     if (file) {
@@ -897,7 +897,7 @@ void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
  
 void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     const char* file2 = modelElement->Attribute("file");
-    const std::string filename = "build/3DFiles/" + std::string(file2);
+    const std::string filename = "../build/3DFiles/" + std::string(file2);
     
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -952,21 +952,21 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[0]);
     glBufferData(
      GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
-     sizeof(float) * m.coords[0].size(), // tamanho do vector em bytes
+     sizeof(float) * 3 * m.coords[0].size(), // tamanho do vector em bytes
      m.coords[0].data(), // os dados do array associado ao vector
     GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
     glBufferData(
      GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
-     sizeof(float) * m.coords[1].size(), // tamanho do vector em bytes
+     sizeof(float) * 2 * m.coords[1].size(), // tamanho do vector em bytes
      m.coords[1].data(), // os dados do array associado ao vector
     GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[2]);
     glBufferData(
      GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
-     sizeof(float) * m.coords[2].size(), // tamanho do vector em bytes
+     sizeof(float) * 3 * m.coords[2].size(), // tamanho do vector em bytes
      m.coords[2].data(), // os dados do array associado ao vector
     GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
@@ -1398,7 +1398,8 @@ int main(int argc, char** argv){
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(widtH,heighT);
 	glutCreateWindow("CG@DI-UM");
-		
+    ilInit();
+
 // Required callback registry 
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
