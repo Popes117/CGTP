@@ -952,21 +952,21 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[0]);
     glBufferData(
      GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
-     sizeof(float) * 3 * m.coords[0].size(), // tamanho do vector em bytes
+     sizeof(float) * m.coords[0].size(), // tamanho do vector em bytes
      m.coords[0].data(), // os dados do array associado ao vector
     GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
     glBufferData(
      GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
-     sizeof(float) * 2 * m.coords[1].size(), // tamanho do vector em bytes
+     sizeof(float) * m.coords[1].size(), // tamanho do vector em bytes
      m.coords[1].data(), // os dados do array associado ao vector
     GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
     glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[2]);
     glBufferData(
      GL_ARRAY_BUFFER, // tipo do buffer, só é relevante na altura do desenho
-     sizeof(float) * 3 * m.coords[2].size(), // tamanho do vector em bytes
+     sizeof(float) * m.coords[2].size(), // tamanho do vector em bytes
      m.coords[2].data(), // os dados do array associado ao vector
     GL_STATIC_DRAW); // indicativo da utilização (estático e para desenho)
 
