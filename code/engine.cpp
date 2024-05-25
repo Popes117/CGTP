@@ -67,6 +67,7 @@ int length_form;
 int divisions_form;
 
 int opcao;
+GLenum light_id = 0;
 
 using namespace std;
 
@@ -359,14 +360,18 @@ std::vector<vector<float>> parsePlane(const std::string& filename) {
 	return pontos;
 }
 
-std::vector<float> parseBox(const std::string& filename) {
+std::vector<vector<float>> parseBox(const std::string& filename) {
     
     std::string first_line;
     int length;
     int divisions;
-    int count = -1;
+    std::vector<vector<float>> pontos;
+    std::vector<float> pontos_a;
+    std::vector<float> pontos_tex;
+    std::vector<float> pontos_norm;
+    int count = 0;
 
-    std::vector<float> squares;
+    std::vector<vector<float>> squares;
 
     std::ifstream file(filename);
     char separador;
@@ -380,21 +385,45 @@ std::vector<float> parseBox(const std::string& filename) {
     while (std::getline(file, linha)) {
         if (linha.empty()) {
             count++;
-        } else {
-            std::istringstream iss(linha);
-            Coordenadas ponto;
-            Square square;
+            continue;
+        }
+        
+        std::istringstream iss(linha);
+        Coordenadas ponto;
+        Square square;
 
+        if(count < 7){
             while (iss >> ponto.x >> ponto.y >> ponto.z) {
-                squares.push_back(ponto.x);
-                squares.push_back(ponto.y);
-                squares.push_back(ponto.z);
+                pontos_a.push_back(ponto.x);
+                pontos_a.push_back(ponto.y);
+                pontos_a.push_back(ponto.z);
+		    	iss >> separador;
+            }
+        }
+
+        else if (count == 7){
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_tex.push_back(ponto.x);
+                pontos_tex.push_back(ponto.y);
+                iss >> separador;
+            }
+        }
+
+        else {
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_norm.push_back(ponto.x);
+                pontos_norm.push_back(ponto.y);
+                pontos_norm.push_back(ponto.z);
                 iss >> separador;
             }
         }
     }
 
-    return squares;
+    pontos.push_back(pontos_a);
+    pontos.push_back(pontos_tex);
+    pontos.push_back(pontos_norm);
+
+	return pontos;
 }
 
 
@@ -873,9 +902,11 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
     }
     m.color = color;
     m.hasColor = true;
+    std::cout << "Sai da processColor" << std::endl;
 }
 
 void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
+    
     const char* file = textureElement->Attribute("file");
     filePath = "../build/textures/" + std::string(file);
     filePaths.push_back(filePath);
@@ -888,12 +919,10 @@ void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
     }
 
     std::cout << "CARALHOOOOOOOO" << std::endl;
+
     Texture texture = Texture(filePath);
     std::cout << "Tou no prep" << std::endl;
-    GLenum err;
-    if ((err = glGetError()) != GL_NO_ERROR) {
-        std::cerr << "Erro ao gerar textura BLA: " << gluErrorString(err) << std::endl;
-    }
+
     texture.prep();
     m.texture = texture;
     m.hasTexture = true;
@@ -916,13 +945,14 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
         std::istringstream iss(linha);
         iss >> first_line;
     }
+
     std::vector<float> vetor;
     std::vector<std::vector<float>> pontos;
     if (first_line == "plane") {
         pontos = parsePlane(filename);
     }
     else if (first_line == "box") {
-        vetor = parseBox(filename);
+        pontos = parseBox(filename);
     }
     else if (first_line == "cone") {
         vetor = parseCone(filename);
@@ -933,21 +963,19 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     else if (first_line == "patch") {
         pontos = parsePatches(filename);
     }
+
     Model m = Model();
-    m.hasColor = false;
-    m.hasTexture = false;
+
+    std :: cout << "Tou a processar o model" << std::endl;
+
     m.vbo_ids[0] = counter;
     m.vbo_ids[1] = counter + 1;
     m.vbo_ids[2] = counter + 2;
+    std :: cout << "Cheguei aqui" << std::endl;
     m.coords.push_back(pontos[0]);
     m.coords.push_back(pontos[1]);
     m.coords.push_back(pontos[2]);
     m.count = pontos[0].size() / 3;
-    
-    GLuint vecLoc;
-    glGenBuffers(1,&m.vbo_ids[0]);
-    glGenBuffers(1,&m.vbo_ids[1]);
-    glGenBuffers(1,&m.vbo_ids[2]);
 
     vertices.push_back(m.vbo_ids[0]);
     vertices.push_back(m.vbo_ids[1]);
@@ -1105,7 +1133,8 @@ void processLightElement(tinyxml2::XMLElement* child) {
     float px, py, pz, dx, dy, dz, sx, sy, sz, sdx, sdy, sdz, c;
 
     const char* childName = child->Attribute("type");
-    Light light = Light();
+    Light light = Light(light_id);
+    light_id++;
 
     if (strcmp(childName, "point") == 0) {
         child->QueryFloatAttribute("posx", &px);
@@ -1143,6 +1172,7 @@ void processLightElement(tinyxml2::XMLElement* child) {
 }
 
 void processLightsElement(tinyxml2::XMLElement* lightsElement) {
+
     for (tinyxml2::XMLElement* modelElement = lightsElement->FirstChildElement("light"); modelElement; modelElement = modelElement->NextSiblingElement("light")) {
         processLightElement(modelElement);
     }
@@ -1424,6 +1454,7 @@ int main(int argc, char** argv){
 //  OpenGL settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+    glEnable(GL_RESCALE_NORMAL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	spherical2Cartesian();

@@ -68,7 +68,7 @@ struct Transform {
 class Texture{
     public:
         GLuint texture_id;
-        unsigned int t, tw, th;
+        unsigned int t, tw, th, tex;
         unsigned int texID;
         unsigned char *texData;
         std::string path;
@@ -111,14 +111,14 @@ class Texture{
             std::cerr << "Erro ao vincular textura: " << gluErrorString(err) << std::endl;
         }
 
-        //glGenTextures(1,&tex);
-        //glBindTexture(GL_TEXTURE_2D,tex);
+        glGenTextures(1,&tex);
+        glBindTexture(GL_TEXTURE_2D,tex);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
-        //glGenerateMipmap(GL_TEXTURE_2D);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
         err = glGetError();
         if (err != GL_NO_ERROR) {
@@ -169,10 +169,22 @@ class Color{
         float ambientArr[4] = {ambient.x, ambient.y, ambient.z, 1.0};
         float specularArr[4] = {specular.x, specular.y, specular.z, 1.0};
         float emissiveArr[4] = {emissive.x, emissive.y, emissive.z, 1.0};
-        if (hasDiffuse) glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseArr);
-        if (hasAmbient) glMaterialfv(GL_FRONT, GL_AMBIENT, ambientArr);
-        if (hasSpecular) glMaterialfv(GL_FRONT, GL_SPECULAR, specularArr);
-        if (hasEmissive) glMaterialfv(GL_FRONT, GL_EMISSION, emissiveArr);
+        if (hasDiffuse){ 
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseArr);
+            //std::cout << "Tenho Diffuse!" << std::endl;
+            };
+        if (hasAmbient){ 
+            glMaterialfv(GL_FRONT, GL_AMBIENT, ambientArr);
+            //std::cout << "Tenho Ambient!" << std::endl;
+            };
+        if (hasSpecular){ 
+            glMaterialfv(GL_FRONT, GL_SPECULAR, specularArr);
+            //std::cout << "Tenho SPECULAR!" << std::endl;
+            }; 
+        if (hasEmissive){ 
+            glMaterialfv(GL_FRONT, GL_EMISSION, emissiveArr);
+            //std::cout << "Tenho Emissive!" << std::endl;
+            };         
         if (hasShininess) glMaterialf(GL_FRONT, GL_SHININESS, shininess);
     }        
 };
@@ -185,9 +197,10 @@ class Light{
     bool hasPosition, hasDirection;
     GLenum gl_light;
 
-    Light(){
+    Light(GLenum lightID){
         hasPosition = false;
         hasDirection = false;
+        gl_light = lightID;
     }
 
     void prep(){
@@ -224,8 +237,34 @@ class Model{
         std::vector<std::vector<float>> coords;
         Texture texture;
         Color color;
-        Model():vbo_ids(), coords(), count(), texture(), color(){}
+
+    Model() : vbo_ids{0}, count(0), coords(), texture(), color() {
+        hasTexture = false;
+        hasColor = false;
+        initializeOpenGLResources();
+    }
+
+    private:
+        void initializeOpenGLResources() {
+            GLenum err = glGetError();
+            if (err != GL_NO_ERROR) {
+                std::cerr << "Erro ao gerar VBOs: " << gluErrorString(err) << std::endl;
+            }
+            glGenBuffers(3, vbo_ids);
+
+        }
 };
+
+//        Model():coords(), texture(), color(){
+//
+//            GLenum err;
+//            if ((err = glGetError()) != GL_NO_ERROR) {
+//                std::cerr << "BRUH: " << gluErrorString(err) << std::endl;
+//            }
+//            
+//            hasTexture = false;
+//            hasColor = false;
+//        }
   
 class Group{
 	
