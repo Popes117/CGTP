@@ -91,7 +91,6 @@ class Texture{
 	    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
         ilGenImages(1,&t);
         ilBindImage(t);
-        //ilLoadImage(path.data());
         if (!ilLoadImage(path.data())) {
             std::cerr << "Erro ao carregar a imagem: " << path << std::endl;
             return;
@@ -102,21 +101,16 @@ class Texture{
         ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
         texData = ilGetData();
 
-
         glGenTextures(1, &texID);
-
-
         glBindTexture(GL_TEXTURE_2D, texID);
         if ((err = glGetError()) != GL_NO_ERROR) {
             std::cerr << "Erro ao vincular textura: " << gluErrorString(err) << std::endl;
         }
 
-        glGenTextures(1,&tex);
-        glBindTexture(GL_TEXTURE_2D,tex);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -166,9 +160,9 @@ class Color{
 
     void apply(){
         float diffuseArr[4] = {diffuse.x/255, diffuse.y/255, diffuse.z/255, 1.0};
-        float ambientArr[4] = {ambient.x, ambient.y, ambient.z, 1.0};
-        float specularArr[4] = {specular.x, specular.y, specular.z, 1.0};
-        float emissiveArr[4] = {emissive.x, emissive.y, emissive.z, 1.0};
+        float ambientArr[4] = {ambient.x/255, ambient.y/255, ambient.z/255, 1.0};
+        float specularArr[4] = {specular.x/255, specular.y/255, specular.z/255, 1.0};
+        float emissiveArr[4] = {emissive.x/255, emissive.y/255, emissive.z/255, 1.0};
         if (hasDiffuse){ 
             glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseArr);
             //std::cout << "Tenho Diffuse!" << std::endl;
@@ -204,27 +198,29 @@ class Light{
     }
 
     void prep(){
-        glEnable(gl_light);
-        glLightfv(gl_light, GL_AMBIENT, white);
-        glLightfv(gl_light, GL_DIFFUSE, white);
-        glLightfv(gl_light, GL_SPECULAR, white);
+        float amb[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
+        glEnable(GL_LIGHT0 + gl_light);
+        glLightfv(GL_LIGHT0 + gl_light, GL_DIFFUSE, white);
+        glLightfv(GL_LIGHT0 + gl_light, GL_SPECULAR, white);
     }
 
     void apply(){
+        direction.normalize();
         if (hasDirection && hasPosition) {
             float posArr[4] = {position.x, position.y, position.z, 1};
-            glLightfv(gl_light, GL_POSITION, posArr);
+            glLightfv(GL_LIGHT0 + gl_light, GL_POSITION, posArr);
             float dirArr[3] = {direction.x, direction.y, direction.z};
-            glLightfv(gl_light, GL_SPOT_DIRECTION, dirArr);
-            glLightfv(gl_light, GL_SPOT_CUTOFF, &cutoff);
+            glLightfv(GL_LIGHT0 + gl_light, GL_SPOT_DIRECTION, dirArr);
+            glLightfv(GL_LIGHT0 + gl_light, GL_SPOT_CUTOFF, &cutoff);
         }
         else if (hasPosition){
             float posArr[4] = {position.x, position.y, position.z, 1};
-            glLightfv(gl_light, GL_POSITION, posArr);
+            glLightfv(GL_LIGHT0 + gl_light, GL_POSITION, posArr);
         }
         else if (hasDirection){
-            float dirArr[4] = {direction.x, direction.y, direction.z, 0};
-            glLightfv(gl_light, GL_POSITION, dirArr);
+            float dirArr[4] = {direction.x, direction.y, direction.z,0};
+            glLightfv(GL_LIGHT0 + gl_light, GL_POSITION, dirArr);
         }
     }
 };
@@ -254,17 +250,6 @@ class Model{
 
         }
 };
-
-//        Model():coords(), texture(), color(){
-//
-//            GLenum err;
-//            if ((err = glGetError()) != GL_NO_ERROR) {
-//                std::cerr << "BRUH: " << gluErrorString(err) << std::endl;
-//            }
-//            
-//            hasTexture = false;
-//            hasColor = false;
-//        }
   
 class Group{
 	

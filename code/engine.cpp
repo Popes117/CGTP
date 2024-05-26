@@ -33,6 +33,8 @@ float elapsedTime = 0.0f;
 bool draw_curve = true;
 bool draw_axis = true;
 bool draw_mode = true;
+bool draw_normals = true;
+bool enable_camera_move = false;
 
 int timebase = 0, frame = 0;
 
@@ -265,9 +267,12 @@ void spherical2Cartesian() {
 	camZ = radius * cos(betA) * cos(alfa);
 
 // Usa-mos isto quando for para mexer a câmara
-    //cameraX = radius * cos(betA) * sin(alfa);
-	//cameraY = radius * sin(betA);
-	//cameraZ = radius * cos(betA) * cos(alfa);
+
+    if(enable_camera_move){
+        cameraX = radius * cos(betA) * sin(alfa);
+	    cameraY = radius * sin(betA);
+	    cameraZ = radius * cos(betA) * cos(alfa);
+    }
 }
 
 
@@ -338,7 +343,6 @@ std::vector<vector<float>> parsePlane(const std::string& filename) {
             while (iss >> ponto.x >> ponto.y >> ponto.z) {
                 pontos_tex.push_back(ponto.x);
                 pontos_tex.push_back(ponto.y);
-                std::cout << ponto.x << " "  << ponto.y << std::endl;
                 iss >> separador;
             }
         }
@@ -466,14 +470,17 @@ std::vector<float> parseCone(const std::string& filename) {
     return triangles;
 }
 
-std::vector<float> parseSphere(const std::string& filename) {
-    int count = -1;
-
+std::vector<vector<float>> parseSphere(const std::string& filename) {
 	std::string first_line;
+    std::vector<vector<float>> pontos;
     std::vector<float> triangles;
+    std::vector<float> pontos_a;
+    std::vector<float> pontos_tex;
+    std::vector<float> pontos_norm;
 
     std::ifstream file(filename);
-    char separador;
+	char separador;
+    int count = 0;
 
     std::string linha;
     
@@ -481,26 +488,51 @@ std::vector<float> parseSphere(const std::string& filename) {
         std::istringstream iss(linha);
         iss >> first_line;
     }
-
+    
     while (std::getline(file, linha)) {
         
         if (linha.empty()) {
+            count++;
             continue;
         }
 
         std::istringstream iss(linha);
         Coordenadas ponto;
-        Square triangle;
+        Square square;
 
-        while (iss >> ponto.x >> ponto.y >> ponto.z) {
-            triangles.push_back(ponto.x);
-            triangles.push_back(ponto.y);
-            triangles.push_back(ponto.z);
-			iss >> separador;
+        if(count < 2){
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_a.push_back(ponto.x);
+                pontos_a.push_back(ponto.y);
+                pontos_a.push_back(ponto.z);
+		    	iss >> separador;
+            }
+        }
+
+        else if (count == 2){
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_tex.push_back(ponto.x);
+                pontos_tex.push_back(ponto.y);
+                iss >> separador;
+            }
+        }
+
+        else {
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_norm.push_back(ponto.x);
+                pontos_norm.push_back(ponto.y);
+                pontos_norm.push_back(ponto.z);
+                iss >> separador;
+            }
         }
     }
 
-    return triangles;
+    pontos.push_back(pontos_a);
+    pontos.push_back(pontos_tex);
+    pontos.push_back(pontos_norm);
+
+	return pontos;
+
 }
 
 
@@ -606,7 +638,6 @@ void draw_model(Model &m){
     
     if(m.hasColor){
         glEnable(GL_LIGHTING);
-	    glEnable(GL_LIGHT0);	
         m.color.apply();
     }
 
@@ -621,7 +652,6 @@ void draw_model(Model &m){
     glNormalPointer(GL_FLOAT,0,0);
 
     if (m.hasTexture){
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, m.vbo_ids[1]);
         m.texture.apply();
         glTexCoordPointer(2, GL_FLOAT, 0, 0);
@@ -632,106 +662,29 @@ void draw_model(Model &m){
     // Limpar o estado do buffer
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+
+    // DESENHO DE NORMAIS 
+
+    if(draw_normals){
+
+        glDisable(GL_LIGHTING);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glBegin(GL_LINES);
+
+        for(int i = 0; i < m.coords[0].size(); i+=3){
+            glVertex3f(m.coords[0][i], m.coords[0][i+1], m.coords[0][i+2]);
+            glVertex3f(m.coords[0][i] + m.coords[2][i], m.coords[0][i+1] + m.coords[2][i+1], m.coords[0][i+2] + m.coords[2][i+2]);
+        }
+
+        glEnd();
+
+    }
+
 	//glEnd();
 
 }
 
-/*
-void draw_box(const std::string& filename){
 
-	std::vector<std::vector<Square>> box_squares = parseBox(filename);
-	
-	glBegin(GL_TRIANGLES);
-    glColor3f(1.0f, 1.0f, 1.0f);
-	for(std::vector<Square> squares : box_squares){
-		for(Square square : squares){
-
-			glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z); 
-    		glVertex3f(square.pontos[1].x,square.pontos[1].y, square.pontos[1].z); 
-			glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z);
-            
-            glVertex3f(square.pontos[2].x,square.pontos[2].y, square.pontos[2].z); 
-    	    glVertex3f(square.pontos[3].x,square.pontos[3].y, square.pontos[3].z); 
-		    glVertex3f(square.pontos[0].x,square.pontos[0].y, square.pontos[0].z);  
-
-		}
-	}
-	glEnd();
-
-}
-
-
-void draw_cone(const std::string& filename){
-
-	std::vector<std::vector<Square>> cone_triangles = parseCone(filename);
-	
-	glBegin(GL_TRIANGLES);
-    glColor3f(1.0f, 1.0f, 1.0f);
-	for(std::vector<Square> triangles : cone_triangles){
-		for(Square triangle : triangles){
-            if(triangle.pontos.size() == 3){
-                glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
-    		    glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
-			    glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z);
-            }
-            else{
-                glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
-    		    glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
-			    glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z);
-                glVertex3f(triangle.pontos[3].x,triangle.pontos[3].y, triangle.pontos[3].z); 
-    		    glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
-			    glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z);
-            }
-
-		}
-	}
-	glEnd();
-
-}
-
-void draw_sphere(const std::string& filename) {
-
-    std::vector<Square> sphere_triangles = parseSphere(filename);
- 
-    // body
-	glBegin(GL_TRIANGLES);
-    glColor3f(1.0f, 1.0f, 1.0f);
-	for(Square triangle : sphere_triangles){
-
-		glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
-    	glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
-		glVertex3f(triangle.pontos[2].x,triangle.pontos[2].y, triangle.pontos[2].z); 
-        glVertex3f(triangle.pontos[3].x,triangle.pontos[3].y, triangle.pontos[3].z); 
-    	glVertex3f(triangle.pontos[1].x,triangle.pontos[1].y, triangle.pontos[1].z); 
-		glVertex3f(triangle.pontos[0].x,triangle.pontos[0].y, triangle.pontos[0].z); 
-	}
-	glEnd();
-
-}
-
-void draw_patches(const std::string& filename) {
-    std::vector<std::vector<Coordenadas>> patches = parsePatches(filename);
-
-    const auto& patch = patches[0]; // Acessa o primeiro patch
-
-    const auto& indexes = patches[1]; // Acessa os índices dos patches
-	glBegin(GL_TRIANGLES); 
-    glColor3f(1.0f, 1.0f, 1.0f);
-	for (size_t i = 0; i < indexes.size(); i++) {
-        const Coordenadas& ponto1 = patch[indexes[i].x]; 
-        const Coordenadas& ponto2 = patch[indexes[i].y]; 
-        const Coordenadas& ponto3 = patch[indexes[i].z]; 
-
-        // Primeiro triângulo
-        glVertex3f(ponto1.x, ponto1.y, ponto1.z);
-        glVertex3f(ponto2.x, ponto2.y, ponto2.z);
-        glVertex3f(ponto3.x, ponto3.y, ponto3.z);
-
-    }
-    glEnd(); 
-    
-}
-*/
 void handle_form(Model &filename){
     draw_model(filename);
 }
@@ -958,7 +911,7 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
         vetor = parseCone(filename);
     }
     else if (first_line == "sphere") {
-        vetor = parseSphere(filename);
+        pontos = parseSphere(filename);
     }
     else if (first_line == "patch") {
         pontos = parsePatches(filename);
@@ -1104,7 +1057,7 @@ void processTransformElement(tinyxml2::XMLElement* transformElement, Group& og_g
 
  
 void processGroupElement(tinyxml2::XMLElement* groupElement, Group& og_group) {
-        
+
     for (tinyxml2::XMLElement* child = groupElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
         const char* childName = child->Name();
  
@@ -1257,7 +1210,10 @@ void renderScene(){
 
 	// Eixos
 
+    handle_groups(og_group);
+
     if(draw_axis){
+        glDisable(GL_LIGHTING);
 	    glBegin(GL_LINES);
 	    // X axis in red
 	    glColor3f(1.0f, 0.0f, 0.0f);
@@ -1273,8 +1229,6 @@ void renderScene(){
 	    glVertex3f(0.0f, 0.0f, 100.0f);
 	    glEnd();
     }
-
-    handle_groups(og_group);
 
 	frame++;
 	time=glutGet(GLUT_ELAPSED_TIME); 
@@ -1365,6 +1319,14 @@ void processKeys(unsigned char c, int xx, int yy) {
         case 'X':   
             draw_axis = !draw_axis;
             break;
+        case 'n':
+        case 'N':   
+            draw_normals = !draw_normals;
+            break;
+        case 'c':
+        case 'C':   
+            enable_camera_move = !enable_camera_move;
+            break;
         case 'm':
         case 'M':   
             draw_mode = !draw_mode;
@@ -1416,10 +1378,15 @@ void printInfo() {
 
 	printf("Vendor: %s\n", glGetString(GL_VENDOR));
 	printf("Renderer: %s\n", glGetString(GL_RENDERER));
-	printf("Version: %s\n", glGetString(GL_VERSION));
+	printf("Version: %s\n\n\n", glGetString(GL_VERSION));
 
-	printf("\nUse Arrows to move the camera up/down and left/right\n");
-	printf("Page Up and Page Down control the distance from the camera to the origin");
+    printf("Controls:\n\n");
+    printf("Press A to enable curve display.\n");
+    printf("Press X to enable axis display.\n");
+    printf("Press N to enable normal display.\n");
+    printf("Press C to enable camera move. (Move with arrows)\n");
+    printf("Press M to change draw mode.\n");
+
 }
 
 
@@ -1448,6 +1415,7 @@ int main(int argc, char** argv){
 	// init GLEW
 #ifndef __APPLE__
 	glewInit();
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 #endif
 	parsexml(argv[1]);
 
@@ -1455,6 +1423,7 @@ int main(int argc, char** argv){
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
     glEnable(GL_RESCALE_NORMAL);
+    glEnable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	spherical2Cartesian();
