@@ -11,10 +11,10 @@ set(OpenGL_GL_PREFERENCE "GLVND")
 add_executable(engine engine.cpp tinyxml2-master/tinyxml2.cpp)
 add_executable(generator generator.cpp)
 
-file(COPY ${CMAKE_SOURCE_DIR}/build/textures/relva.jpg DESTINATION ${CMAKE_BINARY_DIR})
-
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
+include_directories(Include)
+link_directories(Include)
 link_directories(${OpenGL_LIBRARY_DIRS})
 add_definitions(${OpenGL_DEFINITIONS})
 

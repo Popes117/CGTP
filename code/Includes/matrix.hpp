@@ -1,6 +1,7 @@
 #include <vector>
 #include <cmath>
 #include <string>
+#include "common.hpp"
 
 
 void buildRotMatrix(float *x, float *y, float *z, float *m) {
@@ -130,3 +131,34 @@ void renderCatmullRomCurve(float* pos, float* deriv, Transform transform, int te
 	glEnd();
 }
 
+void processCatmullRomTranslation(Transform transform, bool draw_curve, int tesselation){
+
+    float pos[3], deriv[3];
+    float gt = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) / transform.time;
+
+
+    if(draw_curve)
+        renderCatmullRomCurve(pos, deriv, transform, tesselation);
+    getGlobalCatmullRomPoint(gt, pos, deriv, transform);
+    glTranslatef(pos[0], pos[1], pos[2]);
+
+    float xv[3],
+          yv[3] = {0.0f,1.0f,0.0f},
+          zv[3];
+
+	xv[0] = deriv[0];
+	xv[1] = deriv[1];
+	xv[2] = deriv[2];
+
+    normalize(xv);
+    cross(xv,yv,zv);
+    normalize(zv);
+    cross(zv,xv,yv);
+    normalize(yv);
+        
+    if (transform.align){
+        float rot[16];
+        buildRotMatrix(xv,yv,zv,rot);
+        glMultMatrixf(rot);
+    }
+}
