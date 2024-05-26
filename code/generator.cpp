@@ -86,12 +86,22 @@ void generate_plane(int length, int divisions, const std::string& filename){
 
 	for(int i = 0; i < divisions; i++){
 		float x = -((float)length / 2.0f);
+		float x_tex = 0;
 		int count = 0;
 
 		while(count < divisions){
 
 			//Triângulo da metade da esquerda
 			Square square;
+			Square normal;
+			Coordenadas normalCoords1 = {0.0f,1.0f,0.0f};
+			normal.pontos.push_back(normalCoords1);
+			normal.pontos.push_back(normalCoords1);
+			normal.pontos.push_back(normalCoords1);
+			normal.pontos.push_back(normalCoords1);
+			normal.pontos.push_back(normalCoords1);
+			normal.pontos.push_back(normalCoords1);
+			normals.push_back(normal);
 
 			Coordenadas coordenadas1 = {x, 0.0f, z};
 			square.pontos.push_back(coordenadas1);
@@ -123,11 +133,6 @@ void generate_plane(int length, int divisions, const std::string& filename){
 	texts.pontos.push_back(texCoords4);
 	texCoords.push_back(texts);
 
-	Square normal;
-	Coordenadas normalCoords1 = {0.0f,1.0f,0.0f};
-	normal.pontos.push_back(normalCoords1);
-	normals.push_back(normal);
-
 	vector<vector<Square>> squared;
 	squared.push_back(coords);
 	squared.push_back(texCoords);
@@ -152,20 +157,20 @@ void generate_box(int length, int divisions, const std::string& filename){
 	vector<Square> normalCoords;
 	vector<Square> textureCoords;
 
-	Square normals;
-    Coordenadas normalCoords1 = {0,-1,0};
-    Coordenadas normalCoords2 = {0,1,0};
-    Coordenadas normalCoords3 = {1,0,0};
-    Coordenadas normalCoords4 = {0,0,1};
-    Coordenadas normalCoords5 = {-1,0,0};
-    Coordenadas normalCoords6 = {0,0,-1};
-	normals.pontos.push_back(normalCoords1);
-	normals.pontos.push_back(normalCoords2);
-	normals.pontos.push_back(normalCoords3);
-	normals.pontos.push_back(normalCoords4);
-	normals.pontos.push_back(normalCoords5);
-	normals.pontos.push_back(normalCoords6);
-	normalCoords.push_back(normals);
+	//Square normals;
+    //Coordenadas normalCoords1 = {0,-1,0};
+    //Coordenadas normalCoords2 = {0,1,0};
+    //Coordenadas normalCoords3 = {1,0,0};
+    //Coordenadas normalCoords4 = {0,0,1};
+    //Coordenadas normalCoords5 = {-1,0,0};
+    //Coordenadas normalCoords6 = {0,0,-1};
+	//normals.pontos.push_back(normalCoords1);
+	//normals.pontos.push_back(normalCoords2);
+	//normals.pontos.push_back(normalCoords3);
+	//normals.pontos.push_back(normalCoords4);
+	//normals.pontos.push_back(normalCoords5);
+	//normals.pontos.push_back(normalCoords6);
+	//normalCoords.push_back(normals);
 
 	Square textures;
 
@@ -177,16 +182,28 @@ void generate_box(int length, int divisions, const std::string& filename){
 		while(count < divisions){
 
 			Square square;
-
 			Square texts;
-			Coordenadas texCoords1 = {0.0f,0.0f,0.0f};
-			Coordenadas texCoords2 = {0.0f,1.0f,0.0f};
-			Coordenadas texCoords3 = {1.0f,1.0f,0.0f};
-			Coordenadas texCoords4 = {1.0f,0.0f,0.0f};
+			Square normals;
+
+			Coordenadas normalCoords1 = {0,-1,0};
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normalCoords.push_back(normals);
+
+        	Coordenadas texCoords1 = {(float)count / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords2 = {(float)(count + 1) / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords3 = {(float)(count + 1) / divisions, (float)(i + 1) / divisions, 0.0f};
+        	Coordenadas texCoords4 = {(float)count / divisions, (float)(i + 1) / divisions, 0.0f};
 			texts.pontos.push_back(texCoords1);
 			texts.pontos.push_back(texCoords2);
 			texts.pontos.push_back(texCoords3);
+			texts.pontos.push_back(texCoords3);
 			texts.pontos.push_back(texCoords4);
+			texts.pontos.push_back(texCoords1);
 			textureCoords.push_back(texts);			
 
 			Coordenadas coordenadas1 = {x + lado_length, y, z + lado_length};
@@ -218,16 +235,28 @@ void generate_box(int length, int divisions, const std::string& filename){
 		while(count < divisions){
 			
 			Square square;
-
 			Square texts;
-			Coordenadas texCoords1 = {0.0f,0.0f,0.0f};
-			Coordenadas texCoords2 = {0.0f,1.0f,0.0f};
-			Coordenadas texCoords3 = {1.0f,1.0f,0.0f};
-			Coordenadas texCoords4 = {1.0f,0.0f,0.0f};
+			Square normals;
+
+			Coordenadas normalCoords1 = {0,1,0};
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normalCoords.push_back(normals);
+
+        	Coordenadas texCoords1 = {(float)count / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords2 = {(float)(count + 1) / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords3 = {(float)(count + 1) / divisions, (float)(i + 1) / divisions, 0.0f};
+        	Coordenadas texCoords4 = {(float)count / divisions, (float)(i + 1) / divisions, 0.0f};
 			texts.pontos.push_back(texCoords1);
 			texts.pontos.push_back(texCoords2);
 			texts.pontos.push_back(texCoords3);
+			texts.pontos.push_back(texCoords3);
 			texts.pontos.push_back(texCoords4);
+			texts.pontos.push_back(texCoords1);
 			textureCoords.push_back(texts);		
 
 			Coordenadas coordenadas1 = {x, y, z};
@@ -259,16 +288,28 @@ void generate_box(int length, int divisions, const std::string& filename){
 		while(count < divisions){
 
 			Square square;
-
 			Square texts;
-			Coordenadas texCoords1 = {0.0f,0.0f,0.0f};
-			Coordenadas texCoords2 = {0.0f,1.0f,0.0f};
-			Coordenadas texCoords3 = {1.0f,1.0f,0.0f};
-			Coordenadas texCoords4 = {1.0f,0.0f,0.0f};
+			Square normals;
+
+			Coordenadas normalCoords1 = {-1,0,0};
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normalCoords.push_back(normals);
+
+        	Coordenadas texCoords1 = {(float)count / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords2 = {(float)(count + 1) / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords3 = {(float)(count + 1) / divisions, (float)(i + 1) / divisions, 0.0f};
+        	Coordenadas texCoords4 = {(float)count / divisions, (float)(i + 1) / divisions, 0.0f};
 			texts.pontos.push_back(texCoords1);
 			texts.pontos.push_back(texCoords2);
 			texts.pontos.push_back(texCoords3);
+			texts.pontos.push_back(texCoords3);
 			texts.pontos.push_back(texCoords4);
+			texts.pontos.push_back(texCoords1);
 			textureCoords.push_back(texts);		
 
 			Coordenadas coordenadas1 = {x, y, z};
@@ -298,16 +339,28 @@ void generate_box(int length, int divisions, const std::string& filename){
 		while(count < divisions){
 
 			Square square;
-
 			Square texts;
-			Coordenadas texCoords1 = {0.0f,0.0f,0.0f};
-			Coordenadas texCoords2 = {0.0f,1.0f,0.0f};
-			Coordenadas texCoords3 = {1.0f,1.0f,0.0f};
-			Coordenadas texCoords4 = {1.0f,0.0f,0.0f};
+			Square normals;
+
+			Coordenadas normalCoords1 = {1,0,0};
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normalCoords.push_back(normals);
+
+        	Coordenadas texCoords1 = {(float)count / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords2 = {(float)(count + 1) / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords3 = {(float)(count + 1) / divisions, (float)(i + 1) / divisions, 0.0f};
+        	Coordenadas texCoords4 = {(float)count / divisions, (float)(i + 1) / divisions, 0.0f};
 			texts.pontos.push_back(texCoords1);
 			texts.pontos.push_back(texCoords2);
 			texts.pontos.push_back(texCoords3);
+			texts.pontos.push_back(texCoords3);
 			texts.pontos.push_back(texCoords4);
+			texts.pontos.push_back(texCoords1);
 			textureCoords.push_back(texts);		
 
 			Coordenadas coordenadas1 = {x, y + lado_length, z + lado_length};
@@ -339,16 +392,28 @@ void generate_box(int length, int divisions, const std::string& filename){
 		while(count < divisions){
 
 			Square square;
-
 			Square texts;
-			Coordenadas texCoords1 = {0.0f,0.0f,0.0f};
-			Coordenadas texCoords2 = {0.0f,1.0f,0.0f};
-			Coordenadas texCoords3 = {1.0f,1.0f,0.0f};
-			Coordenadas texCoords4 = {1.0f,0.0f,0.0f};
+			Square normals;
+
+			Coordenadas normalCoords1 = {0,0,-1};
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normalCoords.push_back(normals);
+
+        	Coordenadas texCoords1 = {(float)count / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords2 = {(float)(count + 1) / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords3 = {(float)(count + 1) / divisions, (float)(i + 1) / divisions, 0.0f};
+        	Coordenadas texCoords4 = {(float)count / divisions, (float)(i + 1) / divisions, 0.0f};
 			texts.pontos.push_back(texCoords1);
 			texts.pontos.push_back(texCoords2);
 			texts.pontos.push_back(texCoords3);
+			texts.pontos.push_back(texCoords3);
 			texts.pontos.push_back(texCoords4);
+			texts.pontos.push_back(texCoords1);
 			textureCoords.push_back(texts);		
 
 			Coordenadas coordenadas1 = {x + lado_length, y + lado_length, z};
@@ -381,14 +446,27 @@ void generate_box(int length, int divisions, const std::string& filename){
 			Square square;
 
 			Square texts;
-			Coordenadas texCoords1 = {0.0f,0.0f,0.0f};
-			Coordenadas texCoords2 = {0.0f,1.0f,0.0f};
-			Coordenadas texCoords3 = {1.0f,1.0f,0.0f};
-			Coordenadas texCoords4 = {1.0f,0.0f,0.0f};
+			Square normals;
+
+			Coordenadas normalCoords1 = {0,0,1};
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normals.pontos.push_back(normalCoords1);
+			normalCoords.push_back(normals);
+
+        	Coordenadas texCoords1 = {(float)count / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords2 = {(float)(count + 1) / divisions, (float)i / divisions, 0.0f};
+        	Coordenadas texCoords3 = {(float)(count + 1) / divisions, (float)(i + 1) / divisions, 0.0f};
+        	Coordenadas texCoords4 = {(float)count / divisions, (float)(i + 1) / divisions, 0.0f};
 			texts.pontos.push_back(texCoords1);
 			texts.pontos.push_back(texCoords2);
 			texts.pontos.push_back(texCoords3);
+			texts.pontos.push_back(texCoords3);
 			texts.pontos.push_back(texCoords4);
+			texts.pontos.push_back(texCoords1);
 			textureCoords.push_back(texts);		
 
 			Coordenadas coordenadas1 = {x, y, z};
@@ -562,21 +640,21 @@ void generate_sphere(float radius, int slices, int stacks, const std::string& fi
 
 			Square normais;
 
-            square.pontos.push_back(p0n);
-            square.pontos.push_back(p3n);
-            square.pontos.push_back(p1n);
-            square.pontos.push_back(p2n);
-            square.pontos.push_back(p3n);
-            square.pontos.push_back(p0n);
+            normais.pontos.push_back(p0n);
+            normais.pontos.push_back(p3n);
+            normais.pontos.push_back(p1n);
+            normais.pontos.push_back(p2n);
+            normais.pontos.push_back(p3n);
+            normais.pontos.push_back(p0n);
 
 			Square texts;
 
-			square.pontos.push_back(t0);
-            square.pontos.push_back(t3);
-            square.pontos.push_back(t1);
-            square.pontos.push_back(t2);
-            square.pontos.push_back(t3);
-            square.pontos.push_back(t0);
+			texts.pontos.push_back(t0);
+            texts.pontos.push_back(t3);
+            texts.pontos.push_back(t1);
+            texts.pontos.push_back(t2);
+            texts.pontos.push_back(t3);
+            texts.pontos.push_back(t0);
 
 
 			sphere_triangles.push_back(square);	
@@ -587,6 +665,7 @@ void generate_sphere(float radius, int slices, int stacks, const std::string& fi
 	vector<vector<Square>> squared;
 	squared.push_back(sphere_triangles);
 	squared.push_back(normalCoords);
+	squared.push_back(textureCoords);
 	put_object(squared, "sphere", filename);
 }
 
