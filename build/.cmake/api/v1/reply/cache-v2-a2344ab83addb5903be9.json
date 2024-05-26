@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA/cg24/build"
+			"value" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA3/cg24/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -555,7 +555,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA/cg24/build/CMakeFiles/pkgRedirects"
+			"value" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA3/cg24/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -2055,7 +2055,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA/cg24/build"
+			"value" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA3/cg24/build"
 		},
 		{
 			"name" : "engine_IS_TOP_LEVEL",

@@ -6,7 +6,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA/cg24/build/CMakeFiles/3.29.2/CMakeSystem.cmake"
+			"path" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA3/cg24/build/CMakeFiles/3.29.2/CMakeSystem.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -20,11 +20,11 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA/cg24/build/CMakeFiles/3.29.2/CMakeCCompiler.cmake"
+			"path" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA3/cg24/build/CMakeFiles/3.29.2/CMakeCCompiler.cmake"
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA/cg24/build/CMakeFiles/3.29.2/CMakeCXXCompiler.cmake"
+			"path" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA3/cg24/build/CMakeFiles/3.29.2/CMakeCXXCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -200,7 +200,7 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA/cg24/build",
+		"build" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/CGBLA3/cg24/build",
 		"source" : "/home/popes/Desktop/3\u00baAno 2\u00baSemestre/cg24/code"
 	},
 	"version" : 
