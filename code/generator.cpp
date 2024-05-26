@@ -498,9 +498,14 @@ void generate_sphere(float radius, int slices, int stacks, const std::string& fi
     float step;
     float n_stacks;
 
+	const float texture_x_shift = 1.0 / slices;
+    const float texture_y_shift = 1.0 / stacks;
+
     step = 2* M_PI / slices; 
     n_stacks = M_PI / stacks;
     vector<Square> sphere_triangles;
+	vector<Square> normalCoords;
+	vector<Square> textureCoords;
  
     // body
     for (i = 0; i < slices; i++) {
@@ -509,11 +514,42 @@ void generate_sphere(float radius, int slices, int stacks, const std::string& fi
         const float currentStack = j * n_stacks;
         const float nextStack = currentStack + n_stacks;
         const float nextSlice = currentSlice + step;
+		float stack_coords = 1. / stacks, slice_coords = 1. / slices;
 
-            Coordenadas p0 = { (radius * sin(nextStack) * sin(nextSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(nextSlice))};
-            Coordenadas p1 = { (radius * sin(nextStack) * sin(currentSlice)), (radius * cos(nextStack)), (radius * sin(nextStack) * cos(currentSlice)) };
-            Coordenadas p2 = { (radius * sin(currentStack) * sin(nextSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(nextSlice)) };
-            Coordenadas p3 = { (radius * sin(currentStack) * sin(currentSlice)), (radius * cos(currentStack)), (radius * sin(currentStack) * cos(currentSlice)) };
+		const float texture_x = i * texture_x_shift;
+        const float texture_y = j * texture_y_shift;
+        const float next_texture_x = (i + 1) * texture_x_shift;
+    	const float next_texture_y = (j + 1) * texture_y_shift;
+
+
+			float x = radius * sin(nextStack) * sin(nextSlice);
+			float y = (radius * cos(nextStack));
+			float z =(radius * sin(nextStack) * cos(nextSlice));
+        	float vLen = sqrtf(x*x+y*y+z*z);
+            Coordenadas p0 = { x , y, z};
+            Coordenadas p0n = {x / vLen,y / vLen ,z / vLen};
+			Coordenadas t0 = {next_texture_x, next_texture_y,0.};
+			
+
+			
+			x = (radius * sin(nextStack) * sin(currentSlice));
+			z = (radius * sin(nextStack) * cos(currentSlice));
+			Coordenadas p1 = { x, y, z };
+			Coordenadas p1n = {x / vLen,y / vLen ,z / vLen};
+			Coordenadas t1 = {texture_x, next_texture_y,0.};
+
+			x = (radius * sin(currentStack) * sin(nextSlice));
+			y = (radius * cos(currentStack));
+			z = (radius * sin(currentStack) * cos(nextSlice));
+            Coordenadas p2 = { x, y, z };
+			Coordenadas p2n = {x / vLen,y / vLen ,z / vLen};
+			Coordenadas t2 = {next_texture_x, texture_y,0.};
+            
+			x = (radius * sin(currentStack) * sin(currentSlice));
+			z = (radius * sin(currentStack) * cos(currentSlice));
+			Coordenadas p3 = { x , y, z };
+			Coordenadas p3n = {x / vLen,y / vLen ,z / vLen};
+			Coordenadas t3 = {texture_x, texture_y,0.};
 
             Square square;
 
@@ -524,12 +560,33 @@ void generate_sphere(float radius, int slices, int stacks, const std::string& fi
             square.pontos.push_back(p3);
             square.pontos.push_back(p0);
 
+			Square normais;
+
+            square.pontos.push_back(p0n);
+            square.pontos.push_back(p3n);
+            square.pontos.push_back(p1n);
+            square.pontos.push_back(p2n);
+            square.pontos.push_back(p3n);
+            square.pontos.push_back(p0n);
+
+			Square texts;
+
+			square.pontos.push_back(t0);
+            square.pontos.push_back(t3);
+            square.pontos.push_back(t1);
+            square.pontos.push_back(t2);
+            square.pontos.push_back(t3);
+            square.pontos.push_back(t0);
+
+
 			sphere_triangles.push_back(square);	
+			normalCoords.push_back(normais);
+			textureCoords.push_back(texts);
         }
     }
-
 	vector<vector<Square>> squared;
 	squared.push_back(sphere_triangles);
+	squared.push_back(normalCoords);
 	put_object(squared, "sphere", filename);
 }
 
