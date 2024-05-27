@@ -429,44 +429,67 @@ std::vector<vector<float>> parseBox(const std::string& filename) {
 	return pontos;
 }
 
+std::vector<vector<float>> parseCone(const std::string& filename) {
 
-std::vector<float> parseCone(const std::string& filename) {
-    
     std::string first_line;
-    float radius; 
-    float height; 
-    int slices;
-    int stacks;
-    int count = -1;
-
-    std::vector<float> triangles;
-
+    std::vector<vector<float>> pontos;
+    std::vector<float> pontos_a;
+    std::vector<float> pontos_tex;
+    std::vector<float> pontos_norm;
     std::ifstream file(filename);
     char separador;
+    int count = 0;
 
     std::string linha;
+
     if (std::getline(file, linha)) {
         std::istringstream iss(linha);
         iss >> first_line;
     }
 
     while (std::getline(file, linha)) {
+
         if (linha.empty()) {
             count++;
-        } else {
-            std::istringstream iss(linha);
-            Coordenadas ponto;
+            continue;
+        }
 
+        std::istringstream iss(linha);
+        Coordenadas ponto;
+        Square square;
+
+        if(count < 4){
             while (iss >> ponto.x >> ponto.y >> ponto.z) {
-                triangles.push_back(ponto.x);
-                triangles.push_back(ponto.y);
-                triangles.push_back(ponto.z);
+                pontos_a.push_back(ponto.x);
+                pontos_a.push_back(ponto.y);
+                pontos_a.push_back(ponto.z);
+                iss >> separador;
+            }
+        }
+
+        else if (count == 4){
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_tex.push_back(ponto.x);
+                pontos_tex.push_back(ponto.y);
+                iss >> separador;
+            }
+        }
+
+        else {
+            while (iss >> ponto.x >> ponto.y >> ponto.z) {
+                pontos_norm.push_back(ponto.x);
+                pontos_norm.push_back(ponto.y);
+                pontos_norm.push_back(ponto.z);
                 iss >> separador;
             }
         }
     }
 
-    return triangles;
+    pontos.push_back(pontos_a);
+    pontos.push_back(pontos_tex);
+    pontos.push_back(pontos_norm);
+
+    return pontos;
 }
 
 std::vector<vector<float>> parseSphere(const std::string& filename) {
@@ -853,7 +876,6 @@ void processColorElement(tinyxml2::XMLElement* colorElement, Model& m) {
     }
     m.color = color;
     m.hasColor = true;
-    std::cout << "Sai da processColor" << std::endl;
 }
 
 void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
@@ -869,10 +891,7 @@ void processTextureElement(tinyxml2::XMLElement* textureElement, Model& m) {
         std::cerr << "Texture element is missing the 'file' attribute." << std::endl;
     }
 
-    std::cout << "CARALHOOOOOOOO" << std::endl;
-
     Texture texture = Texture(filePath);
-    std::cout << "Tou no prep" << std::endl;
 
     texture.prep();
     m.texture = texture;
@@ -886,7 +905,7 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o arquivo: " << filename << std::endl;
-        return; // ou faça alguma outra coisa para lidar com o erro
+        return; 
     }
 	std::string first_line;
     
@@ -906,7 +925,7 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
         pontos = parseBox(filename);
     }
     else if (first_line == "cone") {
-        vetor = parseCone(filename);
+        pontos = parseCone(filename);
     }
     else if (first_line == "sphere") {
         pontos = parseSphere(filename);
@@ -917,12 +936,9 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
 
     Model m = Model();
 
-    std :: cout << "Tou a processar o model" << std::endl;
-
     m.vbo_ids[0] = counter;
     m.vbo_ids[1] = counter + 1;
     m.vbo_ids[2] = counter + 2;
-    std :: cout << "Cheguei aqui" << std::endl;
     m.coords.push_back(pontos[0]);
     m.coords.push_back(pontos[1]);
     m.coords.push_back(pontos[2]);
@@ -958,18 +974,19 @@ void processModelElement(tinyxml2::XMLElement* modelElement, Group& og_group) {
     filePaths.push_back(filePath);
     og_group.model_paths.push_back(filePath);
 
-for (tinyxml2::XMLElement* child = modelElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
-    const char* childName = child->Name();
+    for (tinyxml2::XMLElement* child = modelElement->FirstChildElement(); child; child = child->NextSiblingElement()) {
+        const char* childName = child->Name();
 
-    if (strcmp(childName, "color") == 0) {
-        std::cout << "Tou a entrar no processColor" << std::endl;
-        processColorElement(child, m);
+        std :: cout << "Child Name: " << childName << std::endl;
+
+        if (strcmp(childName, "color") == 0) {
+            processColorElement(child, m);
+        }
+
+        if (strcmp(childName, "texture") == 0) {
+            processTextureElement(child, m);
+        }   
     }
-
-    if (strcmp(childName, "texture") == 0) {
-        processTextureElement(child, m);
-    }   
-}
 
     og_group.models.push_back(m);
 
@@ -1149,7 +1166,6 @@ int camara_settings(const char *filename) {
     
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(filename) != tinyxml2::XML_SUCCESS) {
-        std::cout << filename << std::endl;
         std::cerr << "Erro ao carregar o arquivo XML." << std::endl;
         return 1;
     }
@@ -1175,7 +1191,6 @@ int camara_settings(const char *filename) {
 int parsexml(const char *filename) {
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(filename) != tinyxml2::XML_SUCCESS) {
-        std::cout << filename << std::endl;
         std::cerr << "Erro ao carregar o arquivo XML." << std::endl;
         return 1;
     }
@@ -1312,7 +1327,7 @@ void processKeys(unsigned char c, int xx, int yy) {
         case 'a':
         case 'A':   
             draw_curve = !draw_curve;
-            break;
+            break;        
         case 'x':
         case 'X':   
             draw_axis = !draw_axis;
@@ -1337,7 +1352,6 @@ void processKeys(unsigned char c, int xx, int yy) {
 
 }
 
-
 void processSpecialKeys(int key, int xx, int yy) {
 
 	switch (key) {
@@ -1360,12 +1374,12 @@ void processSpecialKeys(int key, int xx, int yy) {
 			betA = -1.5f;
 		break;
 
-	case GLUT_KEY_PAGE_DOWN: radius -= 0.1f;
+	case GLUT_KEY_PAGE_DOWN: radius += 0.1f;
 		if (radius < 0.1f)
 			radius = 0.1f;
 		break;
 
-	case GLUT_KEY_PAGE_UP: radius += 0.1f; break;
+	case GLUT_KEY_PAGE_UP: radius -= 0.1f; break;
 	}
 	spherical2Cartesian();
 	glutPostRedisplay();

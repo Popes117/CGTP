@@ -95,7 +95,6 @@ class Texture{
             std::cerr << "Erro ao carregar a imagem: " << path << std::endl;
             return;
         }
-        std::cout << path << std::endl;
         tw = ilGetInteger(IL_IMAGE_WIDTH);
         th = ilGetInteger(IL_IMAGE_HEIGHT);
         ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
@@ -133,7 +132,7 @@ class Texture{
             std::cerr << "Erro ao gerar mipmap: " << gluErrorString(err) << std::endl;
             return;
         }
-        std::cout << "Textura carregada com sucesso" << std::endl; //Não faz este print
+        std::cout << "Textura carregada com sucesso" << std::endl; 
 
     }
 
@@ -163,24 +162,18 @@ class Color{
         float ambientArr[4] = {ambient.x/255, ambient.y/255, ambient.z/255, 1.0};
         float specularArr[4] = {specular.x/255, specular.y/255, specular.z/255, 1.0};
         float emissiveArr[4] = {emissive.x/255, emissive.y/255, emissive.z/255, 1.0};
-        if (hasDiffuse){ 
+        if (hasDiffuse)
             glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseArr);
-            //std::cout << "Tenho Diffuse!" << std::endl;
-            };
-        if (hasAmbient){ 
+        if (hasAmbient)
             glMaterialfv(GL_FRONT, GL_AMBIENT, ambientArr);
-            //std::cout << "Tenho Ambient!" << std::endl;
-            };
-        if (hasSpecular){ 
-            glMaterialfv(GL_FRONT, GL_SPECULAR, specularArr);
-            //std::cout << "Tenho SPECULAR!" << std::endl;
-            }; 
-        if (hasEmissive){ 
+        if (hasSpecular)
+            glMaterialfv(GL_FRONT, GL_SPECULAR, specularArr); 
+        if (hasEmissive)
             glMaterialfv(GL_FRONT, GL_EMISSION, emissiveArr);
-            //std::cout << "Tenho Emissive!" << std::endl;
-            };         
-        if (hasShininess) glMaterialf(GL_FRONT, GL_SHININESS, shininess);
-    }        
+        if (hasShininess) 
+            glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+    }
+              
 };
 
 class Light{

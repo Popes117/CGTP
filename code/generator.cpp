@@ -16,6 +16,13 @@
 #include "Includes/common.hpp"
 
 #endif
+#define sin_to_texture_b(a) (base_texture_x + sin(a) / 4)
+#define cos_to_texture_b(a) (base_texture_y + cos(a) / 2)
+
+#define sin_to_texture_s(a) (side_texture_x + (current_texture_x_radius * sin(a)))
+#define cos_to_texture_s(a) (side_texture_y + (current_texture_y_radius * cos(a)))
+#define sin_to_texture_sn(a) (side_texture_x + (next_texture_x_radius * sin(a)))
+#define cos_to_texture_sn(a) (side_texture_y + (next_texture_y_radius * cos(a)))
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -519,75 +526,178 @@ void generate_box(int length, int divisions, const std::string& filename){
 
 }
 
-
 void generate_cone(float radius, float height, int slices,int stacks, const std::string& filename) {
 
-	int i;
-	float step;
-	float n_stacks;
-	vector<vector<Square>> cone_parts;
-	step = 360.0 / slices;
-	n_stacks = height/stacks;
 
-	vector<Square> bottom;
-	vector<Square> stack;
-	vector<Square> body;
-	// bottom
-	for (i = 0; i < slices; i++) {
+    int i;
+    float step;
+    float n_stacks;
+    vector<vector<Square>> cone_parts;
+    step = 360.0 / slices;
+    n_stacks = height/stacks;
 
-		Square triangle;
-		
-		Coordenadas coordenadas1 = {0, 0, 0};
-		triangle.pontos.push_back(coordenadas1);
-		Coordenadas coordenadas2 = {cos((i + 1) * step * M_PI / 180.0)*radius, 0, -sin((i + 1) * step *M_PI / 180.0)*radius};
-		triangle.pontos.push_back(coordenadas2);
-		Coordenadas coordenadas3 = {cos(i * step * M_PI / 180.0)*radius, 0, -sin(i * step *M_PI / 180.0)*radius};
-		triangle.pontos.push_back(coordenadas3);
-		bottom.push_back(triangle);
-	}
 
-	cone_parts.push_back(bottom);
+    const float beta = atan(radius / height);
+    const float alpha_shift = 2 * M_PI / slices;
 
-	// body
-	for (i = 0; i <= slices; i++) {
-		
-		//Triângulos da primeira stack
 
-		Square triangle;
+    vector<Square> bottom;
+    vector<Square> stack;
+    vector<Square> body;
+    vector<Square> normalCoords;
+    vector<Square> textCoords;
+    // bottom
+    for (i = 0; i < slices; i++) {
 
-		Coordenadas coordenadas1 = {0.0f,height,0.0f};
-		triangle.pontos.push_back(coordenadas1);
-		Coordenadas coordenadas2 = {cos(i * step * M_PI / 180.0)*radius/stacks, height - n_stacks, -sin(i * step *M_PI / 180.0)*radius/stacks};
-		triangle.pontos.push_back(coordenadas2);
-		Coordenadas coordenadas3 = {cos((i + 1) * step * M_PI / 180.0)*radius/stacks, height - n_stacks, -sin((i + 1) * step *M_PI / 180.0)*radius/stacks};
-		triangle.pontos.push_back(coordenadas3);
-		stack.push_back(triangle);
-		
-		for(int j = 1; j < stacks; j++){
 
-			//Triângulo da metade da esquerda
-			Square triangle;
+        Square triangle;
+        Square texture;
+        Square normal;
+       
+        Coordenadas coordenadas1 = {0, 0, 0};
+        triangle.pontos.push_back(coordenadas1);
+        Coordenadas coordenadas2 = {cos((i + 1) * step * M_PI / 180.0)*radius, 0, -sin((i + 1) * step *M_PI / 180.0)*radius};
+        triangle.pontos.push_back(coordenadas2);
+        Coordenadas coordenadas3 = {cos(i * step * M_PI / 180.0)*radius, 0, -sin(i * step *M_PI / 180.0)*radius};
+        triangle.pontos.push_back(coordenadas3);
+       
+        Coordenadas text1 = {1./slices,0,0};
+        texture.pontos.push_back(text1);
+        Coordenadas text2 = {(i+1)*1. /slices, 1./stacks,0};
+        texture.pontos.push_back(text2);
+        Coordenadas text3 = {i * 1./slices, 1./stacks,0};
+        texture.pontos.push_back(text3);
+        textCoords.push_back(texture);
 
-			Coordenadas coordenadas1 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j)};
-			triangle.pontos.push_back(coordenadas1);
-			Coordenadas coordenadas2 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin(i * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
-			triangle.pontos.push_back(coordenadas2);
-			Coordenadas coordenadas3 = {cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), height - n_stacks*(j+1), -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
-			triangle.pontos.push_back(coordenadas3);
-			Coordenadas coordenadas4 = {cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), height - n_stacks*j, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j)};
-			triangle.pontos.push_back(coordenadas4);
-			triangle.pontos.push_back(coordenadas1);
-			triangle.pontos.push_back(coordenadas3);
-			
-			body.push_back(triangle);	
-		}
-	}
-	cone_parts.push_back(stack);
-	cone_parts.push_back(body);
 
-	put_object(cone_parts, "cone", filename);
+        Coordenadas normalc = {0,-1,0};
+        normal.pontos.push_back(normalc);
+        normal.pontos.push_back(normalc);
+        normal.pontos.push_back(normalc);
+        normalCoords.push_back(normal);
+       
+        bottom.push_back(triangle);
+
+
+    }
+
+
+    cone_parts.push_back(bottom);
+
+
+    // body
+    for (i = 0; i <= slices; i++) {
+       
+        //Triângulos da primeira stack
+        float alpha = alpha_shift * i;
+        float alpha_next = alpha_shift * (i + 1);
+        float x = cos(beta) * sin(alpha);
+        float y = sin(beta);
+        float z = cos(beta) * cos(alpha);
+        float vLen = sqrtf(x*x+y*y+z*z);
+        Coordenadas sideNorm = { cos(beta) * sin(alpha) / vLen, sin(beta) / vLen, cos(beta) * cos(alpha) / vLen };
+
+
+        x = cos(beta) * sin(alpha_next);
+        y = sin(beta);
+        z = cos(beta) * cos(alpha_next);
+        vLen = sqrtf(x*x+y*y+z*z);
+        Coordenadas nextSideNorm = { cos(beta) * sin(alpha_next) / vLen, sin(beta) / vLen, cos(beta) * cos(alpha_next) / vLen };
+        Square triangle;
+
+
+        Coordenadas coordenadas1 = {0.0f,height,0.0f};
+        triangle.pontos.push_back(coordenadas1);
+        Coordenadas coordenadas2 = {cos(i * step * M_PI / 180.0)*radius/stacks, height - n_stacks, -sin(i * step *M_PI / 180.0)*radius/stacks};
+        triangle.pontos.push_back(coordenadas2);
+        Coordenadas coordenadas3 = {cos((i + 1) * step * M_PI / 180.0)*radius/stacks, height - n_stacks, -sin((i + 1) * step *M_PI / 180.0)*radius/stacks};
+        triangle.pontos.push_back(coordenadas3);
+        stack.push_back(triangle);
+
+
+        Square normalTop;
+        normalTop.pontos.push_back(sideNorm);
+        normalTop.pontos.push_back(sideNorm);
+        normalTop.pontos.push_back(sideNorm);
+        normalCoords.push_back(normalTop);
+
+
+        Square textureTop;
+        Coordenadas texturaT1 = {i * 1./slices,0,0.0f};
+        Coordenadas texturaT2 = {i * 1./slices, 1,0};
+        Coordenadas texturaT3 = {(i+1) * 1./slices, 1,0};
+        textureTop.pontos.push_back(texturaT2);
+        textureTop.pontos.push_back(texturaT1);
+        textureTop.pontos.push_back(texturaT3);
+        textCoords.push_back(textureTop);
+       
+        for(int j = 1; j < stacks; j++){
+
+
+            Square triangle;
+
+
+            const float current_y = height - n_stacks*j;
+            const float next_y = height - n_stacks*(j+1);
+
+
+           
+            Coordenadas coordenadas1 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*j), current_y, -sin(i * step *M_PI / 180.0)*((radius/stacks)*j)};
+            triangle.pontos.push_back(coordenadas1);
+            Coordenadas coordenadas2 = {cos(i * step * M_PI / 180.0)*((radius/stacks)*(j+1)), next_y, -sin(i * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
+            triangle.pontos.push_back(coordenadas2);
+            Coordenadas coordenadas3 = {cos((i + 1) * step * M_PI / 180.0)*((radius/stacks)*(j+1)), next_y, -sin((i + 1) * step *M_PI / 180.0)*((radius/stacks)*(j+1))};
+            triangle.pontos.push_back(coordenadas3);
+            Coordenadas coordenadas4 = {cos((i+1) * step * M_PI / 180.0)*((radius/stacks)*j), current_y, -sin((i+1) * step *M_PI / 180.0)*((radius/stacks)*j)};
+            triangle.pontos.push_back(coordenadas4);
+            triangle.pontos.push_back(coordenadas1);
+            triangle.pontos.push_back(coordenadas3);
+            body.push_back(triangle);
+
+
+            Square normal;
+
+
+            normal.pontos.push_back(sideNorm); //0
+            normal.pontos.push_back(sideNorm); //3
+            normal.pontos.push_back(nextSideNorm); //2
+            normal.pontos.push_back(nextSideNorm); //1
+            normal.pontos.push_back(sideNorm);
+            normal.pontos.push_back(nextSideNorm);
+
+
+           
+            normalCoords.push_back(normal);
+
+
+            Square textura;
+            Coordenadas textura1 = {(i) * 1./slices, (j) * 1./stacks,0};
+            Coordenadas textura2 = {(i+1) * 1./slices, (j) * 1./stacks,0};
+            Coordenadas textura3 = {(i) * 1./slices, (j+1) * 1./stacks,0};
+            Coordenadas textura4 = {(i+1) * 1./slices, (j+1) * 1./stacks,0};
+            textura.pontos.push_back(textura1);
+            textura.pontos.push_back(textura2);
+            textura.pontos.push_back(textura4);
+            textura.pontos.push_back(textura4);
+            textura.pontos.push_back(textura3);
+            textura.pontos.push_back(textura1);
+
+
+            textCoords.push_back(textura);
+        }
+    }
+    cone_parts.push_back(stack);
+    cone_parts.push_back(body);
+    cone_parts.push_back(textCoords);
+    cone_parts.push_back(normalCoords);
+   
+
+
+    put_object(cone_parts, "cone", filename);
+
 
 }
+
 
 void generate_sphere(float radius, int slices, int stacks, const std::string& filename){
     int i;
@@ -929,7 +1039,6 @@ int main(int argc, char** argv){
 		generate_patches(argv[2], std::stoi(argv[3]),argv[4]);
 	}
 	else{
-		std::cout << "Main" << "\n";
         std::cout << "Erro ao abrir o ficheiro!\n";
 		return 0;
 	}

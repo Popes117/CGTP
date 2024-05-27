@@ -1,0 +1,190 @@
+<world>
+    <window width="1920" height="1080" />
+    <camera> 
+        <position x="50" y="30" z="30" />
+	    <lookAt x="20" y="0" z="0" />
+	    <up x="0" y="1" z="0" /> <!-- optional, use these values as default-->
+        <projection fov="60" near="1" far="1000" /> <!-- optional, use these values as default-->
+    </camera>
+    <lights>
+        <light type="point" posx="0" posy="0" posz="0"/>
+    </lights>
+
+    <group>
+        <transform> 
+            <translate x="0" y="1" z="0" />
+        </transform>
+        <group> 
+            <transform> 
+                <rotate time="90" x="0" y ="1" z = "0"/>
+                <translate x="0" y="0" z="0" />
+                <scale x="8" y="8" z="8"/> <!-- Sol -->
+            </transform>
+			<models> 
+				<model file="sphere_1_3_4.3d" > 
+                <texture file = "sol.jpg" />
+                <color>
+                    <diffuse R="255" G="255" B="255" />
+                    <ambient R="255" G="255" B="255" />
+                    <specular R="255" G="255" B="255" />
+                    <emissive R="255" G="255" B="255" />
+                    <shininess value="0" />
+                </color>
+                </model>
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="90" x="0" y ="1" z = "0" />
+                <translate time = "6" align="true">
+					<point x = "13" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "13" />
+					<point x = "-13" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-13" />
+				</translate>
+                <scale x="0.4" y="0.4" z="0.4"/> <!-- Mercurio -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" > 
+                <texture file = "mercurio.jpg" />
+                </model>
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="80" x="0" y ="1" z = "0" />
+                <translate time = "10" align="true">
+					<point x = "18" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "18" />
+					<point x = "-18" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-18" />
+				</translate>
+                <scale x="1.2" y="1.2" z="1.2"/> <!-- Venus -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" > 
+                <texture file = "venus.jpg" />
+                </model>
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="70" x="0" y ="1" z = "0" />
+                <translate time = "20" align="true">
+					<point x = "23" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "23" />
+					<point x = "-23" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-23" />
+				</translate>
+                <scale x="1.4" y="1.4" z="1.4"/> <!-- Terra -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" > 
+                <texture file = "terra.jpg" />
+                </model>
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="50" x="0" y ="1" z = "0" />
+                <translate time = "25" align="true">
+					<point x = "30" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "30" />
+					<point x = "-30" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-30" />
+				</translate>
+                <scale x="0.6" y="0.6" z="0.6"/> <!-- Marte -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" >
+                <texture file = "marte.jpg" /> 
+                </model>
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="30" x="0" y ="1" z = "0" />
+                <translate time = "50" align="true">
+					<point x = "50" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "50" />
+					<point x = "-50" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-50" />
+				</translate>
+                <scale x="5" y="5" z="5"/> <!-- Jupiter -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" >
+                <texture file = "jupiter.jpg" /> 
+                </model>
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="20" x="0" y ="1" z = "0" />
+                <translate time = "60" align="true">
+					<point x = "65" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "65" />
+					<point x = "-65" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-65" />
+				</translate>
+                <scale x="4" y="4" z="4"/> <!-- Saturno -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" >
+                <texture file = "saturno.jpg" />
+                </model> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="15" x="0" y ="1" z = "0" />
+                <translate time = "80" align="true">
+					<point x = "80" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "80" />
+					<point x = "-80" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-80" />
+				</translate>
+                <scale x="3" y="3" z="3"/> <!-- Neptuno -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" >
+                    <texture file = "urano.jpg" />
+                </model> 
+			</models>
+        </group>
+        <group> 
+            <transform> 
+                <rotate time="10" x="0" y ="1" z = "0" />
+                <translate time = "90" align="true">
+					<point x = "95" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "95" />
+					<point x = "-95" y = "0" z = "0" />
+					<point x = "0" y = "0" z = "-95" />
+				</translate>
+                <scale x="3" y="3" z="3"/> <!-- Urano -->
+            </transform>
+			<models> 
+				<model file="sphere_1_8_8.3d" >
+                <texture file = "neptuno.jpg" />
+                </model>
+			</models>
+        </group>
+        <group>
+                <transform>
+                    <rotate time="120" x="0" y="1" z="0"/>
+                    <translate time="50" align="true">
+                        <point x="-10" y="0" z="0" />
+                        <point x="30" y="0" z="20" />
+                        <point x="120" y="0" z="0" />
+                        <point x="30" y="0" z="-20" />
+                    </translate>
+                    <scale x="0.2" y="0.2" z="0.2"/>
+                </transform>
+                <models>
+                    <model file="bezier_10.3d">
+                    <texture file = "death_star.png" />
+                    </model>
+                </models>
+            </group>
+	</group>
+</world>
